@@ -1,4 +1,4 @@
-import { PieceType } from "../components/ChessPiece";
+import { PieceType } from "../components/ChessPiece/ChessPiece";
 import { ChessLocation } from "./chessBoardLogic";
 
 export default interface ChessMove {

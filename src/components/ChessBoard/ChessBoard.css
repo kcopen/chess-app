@@ -1,17 +1,11 @@
 .chessboard {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    width: 80vh;
-    height: auto;
+    width: 800px;
+    height: 800px;
     border-style: solid;
     border-width: 3px;
     border-color: red;
     
     
-}
-
-.chess-square {
-    aspect-ratio: 1;
-    width: 1fr;
-    height: 1fr;
 }
