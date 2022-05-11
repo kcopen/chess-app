@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
 import { ChessSquare } from "../ChessSquare/ChessSquare";
-import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE } from "../../constants/config";
-import { Chessboard, ChessColor, ChessMove, Piece, Square } from "../../constants/ChessTypes";
+import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../constants/config";
+import { Chessboard, ChessColor, ChessMove, Coords, Piece, Square } from "../../constants/ChessTypes";
 import "./ChessBoard.css";
 import { initPieces, initSquares } from "../../chessLogic/boardInit";
-import { isValidMove } from "../../chessLogic/chessRules";
+import { inGridBounds, isValidMove } from "../../chessLogic/chessRules";
 
 interface Props {
 	playerColor: ChessColor;
@@ -28,15 +28,17 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 
 	//attempt to take turn
 	function attemptTurn(suggestedMove: ChessMove) {
-		if (turn === playerColor && isValidMove(suggestedMove)) {
+		//make sure its the players turn and they are using their own piece
+		if (turn !== playerColor) return; //|| activePiece?.piece.pieceColor !== playerColor) return;
+		if (isValidMove(suggestedMove)) {
 			//move is valid so update the board
 			setBoardData((prev) => {
 				//update the pieces
 				const pieces = prev.pieces.map((p) => {
 					//if p is the activePiece then update its coords
 					if (p.coords.x === activePiece?.grabCoords.gridX && p.coords.y === activePiece?.grabCoords.gridY) {
-						p.coords.x = suggestedMove.targetSquare.coords.x;
-						p.coords.y = suggestedMove.targetSquare.coords.y;
+						p.coords.x = suggestedMove.targetCoords.x;
+						p.coords.y = suggestedMove.targetCoords.y;
 					}
 					return p;
 				});
@@ -71,12 +73,13 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 	}
 
 	function grabPiece(e: React.MouseEvent) {
+		if (activePiece) return; //already holding piece
 		const chessBoard = chessBoardRef.current;
 		const element = e.target as HTMLElement;
 		if (element.classList.contains("chess-piece") && chessBoard) {
 			//mouse position in grid units
-			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / 100);
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / 100)); //might be GRID_SIZE
+			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / SQUARE_SIZE);
+			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / SQUARE_SIZE));
 
 			//position of element to render (mouse location in pixels)
 			const x = e.clientX - PIECE_SIZE / 2;
@@ -98,12 +101,22 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 	function movePiece(e: React.MouseEvent) {
 		const chessBoard = chessBoardRef.current;
 		if (activePiece && chessBoard) {
-			//boundaries of the chessboard in pixels
+			//boundaries of the chessboard that the piece element can be within in pixels
 			const minX = chessBoard.offsetLeft - PIECE_SIZE / 2;
 			const minY = chessBoard.offsetTop - PIECE_SIZE / 2;
 			const maxX = minX + BOARD_SIZE;
 			const maxY = minY + BOARD_SIZE;
 
+			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE);
+			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / PIECE_SIZE));
+			const gridCoords: Coords = { x: gridX, y: gridY };
+			if (!inGridBounds(gridCoords)) {
+				activePiece.element.style.position = "relative";
+				activePiece.element.style.removeProperty("left");
+				activePiece.element.style.removeProperty("top");
+				setActivePiece(null);
+				return;
+			}
 			//position of element to render (mouse location in pixels)
 			const x = e.clientX - PIECE_SIZE / 2;
 			const y = e.clientY - PIECE_SIZE / 2;
@@ -128,19 +141,16 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 			//current grid coordinates of mouse
 			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE);
 			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / PIECE_SIZE));
-			console.log(`dropX:${gridX} dropY:${gridY}`);
-			//square being moused over
-			const targetSquare: Square | undefined = boardData.squares.find((s) => s.coords.x === gridX && s.coords.y === gridY);
+			const gridCoords: Coords = { x: gridX, y: gridY };
 
-			if (targetSquare) {
-				//move being attempted by player
-				const moveAttempt: ChessMove = {
-					boardData: boardData,
-					pieceToMove: activePiece.piece,
-					targetSquare: targetSquare,
-				};
-				attemptTurn(moveAttempt);
-			}
+			//move being attempted by player
+			const moveAttempt: ChessMove = {
+				boardData: boardData,
+				pieceToMove: activePiece.piece,
+				targetCoords: gridCoords,
+			};
+			attemptTurn(moveAttempt);
+
 			//reset the styles and set active piece to null aka "drop" the element
 			activePiece.element.style.position = "relative";
 			activePiece.element.style.removeProperty("left");

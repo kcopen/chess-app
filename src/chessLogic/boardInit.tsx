@@ -6,8 +6,8 @@ export const initPieces = (): Piece[] => {
 		pieceType: PieceType.Rook,
 		pieceColor: ChessColor.White,
 		coords: {
-			x: 1,
-			y: 1,
+			x: 5,
+			y: 4,
 		},
 	});
 	pieces.push({

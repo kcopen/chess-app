@@ -12,21 +12,20 @@ export enum ChessColor {
 	Black = "black",
 }
 
+export interface Coords {
+	x: number;
+	y: number;
+}
+
 export interface Piece {
 	pieceType: PieceType;
 	pieceColor: ChessColor;
-	coords: {
-		x: number;
-		y: number;
-	};
+	coords: Coords;
 }
 
 export interface Square {
 	color: ChessColor;
-	coords: {
-		x: number;
-		y: number;
-	};
+	coords: Coords;
 	piece: Piece | null;
 }
 
@@ -38,5 +37,5 @@ export interface Chessboard {
 export interface ChessMove {
 	boardData: Chessboard;
 	pieceToMove: Piece;
-	targetSquare: Square;
+	targetCoords: Coords;
 }
