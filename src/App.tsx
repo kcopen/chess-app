@@ -1,11 +1,11 @@
-import React from "react";
 import "./App.css";
 import { ChessBoard } from "./components/ChessBoard/ChessBoard";
+import { ChessColor } from "./constants/ChessTypes";
 
 function App() {
 	return (
 		<div className="App">
-			<ChessBoard />
+			<ChessBoard playerColor={ChessColor.White} />
 		</div>
 	);
 }

@@ -1,31 +1,30 @@
-import React, { useState } from "react";
-import { ChessPiece, ChessPieceData } from "../ChessPiece/ChessPiece";
-import { square_color } from "../../constants/squareLogic";
-import { ChessLocation } from "../../constants/chessBoardLogic";
+import React from "react";
+import { ChessPiece } from "../ChessPiece/ChessPiece";
+import { square_color } from "../../chessLogic/squareLogic";
+import { PieceType } from "../../constants/ChessTypes";
 import "./ChessSquare.css";
 
-export interface SquareData {
-	location: ChessLocation;
-	color: string;
-	piece?: ChessPieceData;
+interface Props {
+	squareColor: string;
+	piece?: {
+		pieceType: PieceType;
+		pieceColor: string;
+	};
 }
 
-export const ChessSquare: React.FC<SquareData> = ({ location, color, piece }: SquareData) => {
-	const [squareData, setSquareData] = useState({
-		location: {
-			x: location.x,
-			y: location.y,
-		},
-		color: color,
-		piece: piece,
-	});
-	const styles = {
-		backgroundColor: square_color(color),
+export const ChessSquare: React.FC<Props> = ({ squareColor, piece }: Props) => {
+	const squareStyles = {
+		backgroundColor: square_color(squareColor),
 	};
 
+	const pieceElement = () => {
+		if (piece) {
+			return <ChessPiece pieceType={piece.pieceType} pieceColor={piece.pieceColor} />;
+		}
+	};
 	return (
-		<div className="chess-square" style={styles}>
-			{piece && <ChessPiece location={piece.location} pieceType={piece.pieceType} pieceColor={piece.pieceColor} />}
+		<div className="chess-square" style={squareStyles}>
+			{pieceElement()}
 		</div>
 	);
 };
