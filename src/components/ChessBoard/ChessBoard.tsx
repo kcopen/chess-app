@@ -29,7 +29,7 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 	//attempt to take turn
 	function attemptTurn(suggestedMove: ChessMove) {
 		//make sure its the players turn and they are using their own piece
-		if (turn !== playerColor) return; //|| activePiece?.piece.pieceColor !== playerColor) return;
+		//if (turn !== playerColor || activePiece?.piece.pieceColor !== playerColor) return;
 		if (isValidMove(suggestedMove)) {
 			//move is valid so update the board
 			setBoardData((prev) => {

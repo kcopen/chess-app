@@ -3,6 +3,7 @@ import { GRID_SIZE } from "../constants/config";
 
 export const isValidMove = (move: ChessMove): boolean => {
 	if (!inGridBounds(move.targetCoords)) return false;
+	if (isSameCoords(move.pieceToMove.coords, move.targetCoords)) return false;
 	switch (move.pieceToMove.pieceType) {
 		case PieceType.Pawn:
 			return isValidPawnMove(move);
@@ -26,8 +27,6 @@ function isValidPawnMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 }
 
 function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	if (isSameCoords(pieceToMove.coords, targetCoords)) return false;
-
 	if (pieceToMove.coords.x === targetCoords.x) {
 		//check for pieces between the piece and its target square
 		if (pieceToMove.coords.y < targetCoords.y) {
@@ -56,7 +55,23 @@ function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 }
 
 function isValidKnightMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	return true;
+	const testCoords: Coords[] = [
+		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 2 },
+		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y - 2 },
+		{ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 2 },
+		{ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y - 2 },
+		{ x: pieceToMove.coords.x + 2, y: pieceToMove.coords.y + 1 },
+		{ x: pieceToMove.coords.x + 2, y: pieceToMove.coords.y - 1 },
+		{ x: pieceToMove.coords.x - 2, y: pieceToMove.coords.y + 1 },
+		{ x: pieceToMove.coords.x - 2, y: pieceToMove.coords.y - 1 },
+	];
+	for (const coord of testCoords) {
+		if (!isSameCoords(targetCoords, coord)) continue;
+		const testPiece = pieceAt(coord, boardData);
+		if (!testPiece) return true;
+		else if (testPiece.pieceColor !== pieceToMove.pieceColor) return true;
+	}
+	return false;
 }
 
 function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
@@ -79,13 +94,13 @@ export const isSameCoords = (a: { x: number; y: number }, b: { x: number; y: num
 };
 
 export const squareAt = (coords: { x: number; y: number }, boardData: Chessboard): Square | undefined => {
+	if (!inGridBounds(coords)) return undefined;
 	return boardData.squares.find((s) => isSameCoords(s.coords, coords));
 };
 
 export const pieceAt = (coords: { x: number; y: number }, boardData: Chessboard): Piece | undefined => {
-	const piece = boardData.pieces.find((p) => isSameCoords(p.coords, coords));
-	console.log(piece ? piece.coords : "");
-	return piece;
+	if (!inGridBounds(coords)) return undefined;
+	return boardData.pieces.find((p) => isSameCoords(p.coords, coords));
 };
 
 export const inGridBounds = (coords: Coords): boolean => {
