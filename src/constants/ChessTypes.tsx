@@ -27,7 +27,7 @@ export interface Piece {
 export interface Square {
 	color: ChessColor;
 	coords: Coords;
-	piece: Piece | null;
+	piece: Piece | undefined;
 }
 
 export interface Chessboard {
@@ -39,5 +39,4 @@ export interface ChessMove {
 	boardData: Chessboard;
 	pieceToMove: Piece;
 	targetCoords: Coords;
-	isEmpessante?: boolean;
 }

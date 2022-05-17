@@ -192,7 +192,7 @@ export const initSquares = (pieces: Piece[], perspective: ChessColor): Square[] 
 					x: file,
 					y: rank,
 				},
-				piece: null,
+				piece: undefined,
 			});
 		}
 	}

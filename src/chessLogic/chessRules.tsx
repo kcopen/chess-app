@@ -3,7 +3,7 @@ import { ChessMove, PieceType, Square, Chessboard, Piece, Coords, ChessColor } f
 import { GRID_SIZE } from "../constants/config";
 
 //todo make sure king isnt in check before returning
-export const isValidMove = (move: ChessMove): boolean => {
+export const isValidMove = (move: ChessMove, validateCheck: boolean = true): boolean => {
 	if (!inGridBounds(move.targetCoords)) return false;
 	if (isSameCoords(move.pieceToMove.coords, move.targetCoords)) return false;
 	let isValid = false;
@@ -29,16 +29,59 @@ export const isValidMove = (move: ChessMove): boolean => {
 		default:
 			isValid = false;
 	}
-	generateBoardAfterMove(move);
+	if (isValid && validateCheck) {
+		isValid = !inCheck(move.pieceToMove.pieceColor, boardAfterMove(move));
+	}
+
 	return isValid;
 };
 
-function generateBoardAfterMove({ boardData, pieceToMove, targetCoords, isEmpessante }: ChessMove): Chessboard {
+function inCheck(color: ChessColor, board: Chessboard): boolean {
+	const friendlyKing = board.pieces.find((p) => {
+		return p.pieceType === PieceType.King && p.pieceColor === color;
+	});
+	if (!friendlyKing) return false;
+
+	const enemyPieces = board.pieces.filter((p) => p.pieceColor !== color);
+	for (let enemyPiece of enemyPieces) {
+		const attackKing = {
+			boardData: board,
+			pieceToMove: enemyPiece,
+			targetCoords: friendlyKing.coords,
+		};
+		if (isValidMove(attackKing, false)) return true;
+	}
+	return false;
+}
+
+export const boardAfterMove = (move: ChessMove): Chessboard => {
+	const { boardData, pieceToMove, targetCoords } = move;
 	const updatedBoard: Chessboard = JSON.parse(JSON.stringify(boardData)); //create a deep copy of the board
-	const updatedPieces: Piece[] = updatedBoard.pieces;
+
+	//remove the piece to be captured if there is one
+	updatedBoard.pieces = updatedBoard.pieces.filter((p) => {
+		if (isEmpessant(move)) {
+			return !isSameCoords({ x: targetCoords.x, y: pieceToMove.coords.y }, p.coords);
+		} else {
+			return !isSameCoords(targetCoords, p.coords);
+		}
+	});
+
+	//move the piece being moved tot the target coords
+	const pieceBeingMoved = pieceAt(pieceToMove.coords, updatedBoard);
+	if (pieceBeingMoved) {
+		pieceBeingMoved.coords.x = targetCoords.x;
+		pieceBeingMoved.coords.y = targetCoords.y;
+		pieceBeingMoved.moveCount = pieceBeingMoved.moveCount + 1;
+	}
+
+	//update the squares on the board
+	updatedBoard.squares.forEach((s) => {
+		s.piece = pieceAt(s.coords, updatedBoard);
+	});
 
 	return updatedBoard;
-}
+};
 //empessant not done need to make sure the pawn beside moved last turn
 function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (pieceToMove.pieceType !== PieceType.Pawn) return false;
@@ -131,7 +174,7 @@ function isValidPawnMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 }
 
 function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	if (pieceToMove.pieceType !== PieceType.Rook) return false;
+	if (!(pieceToMove.pieceType === PieceType.Rook || pieceToMove.pieceType === PieceType.Queen)) return false;
 	if (pieceToMove.coords.x === targetCoords.x) {
 		//target square is in the same column
 		if (pieceToMove.coords.y < targetCoords.y) {
@@ -216,7 +259,7 @@ function isValidKnightMove({ boardData, pieceToMove, targetCoords }: ChessMove):
 }
 
 function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	if (pieceToMove.pieceType !== PieceType.Bishop) return false;
+	if (!(pieceToMove.pieceType === PieceType.Bishop || pieceToMove.pieceType === PieceType.Queen)) return false;
 	if (targetCoords.x > pieceToMove.coords.x && targetCoords.y > pieceToMove.coords.y) {
 		for (let x = pieceToMove.coords.x + 1, y = pieceToMove.coords.y + 1; x <= targetCoords.x, y <= targetCoords.y; x++, y++) {
 			const otherPiece = pieceAt({ x, y }, boardData);

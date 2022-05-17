@@ -4,7 +4,7 @@ import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../constants/
 import { Chessboard, ChessColor, ChessMove, Coords, Piece, Square } from "../../constants/ChessTypes";
 import "./ChessBoard.css";
 import { initPieces, initSquares } from "../../chessLogic/boardInit";
-import { inGridBounds, isValidMove } from "../../chessLogic/chessRules";
+import { boardAfterMove, inGridBounds, isValidMove } from "../../chessLogic/chessRules";
 
 interface Props {
 	playerColor: ChessColor;
@@ -32,43 +32,8 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 		//if (turn !== playerColor || activePiece?.piece.pieceColor !== playerColor) return;
 		if (isValidMove(suggestedMove)) {
 			//move is valid so update the board
-			setBoardData((prev) => {
-				//update the pieces
-				const pieces = prev.pieces.map((p) => {
-					//if p is the activePiece then update its coords and moveCount
-					if (p.coords.x === activePiece?.grabCoords.gridX && p.coords.y === activePiece?.grabCoords.gridY) {
-						p.coords.x = suggestedMove.targetCoords.x;
-						p.coords.y = suggestedMove.targetCoords.y;
-						p.moveCount = p.moveCount + 1;
-					}
-					return p;
-				});
-				//update the squares
-				const squares = prev.squares.map((s) => {
-					//find the piece that is on s
-					const piece = pieces.find((p) => {
-						return p.coords.x === s.coords.x && p.coords.y === s.coords.y;
-					});
-
-					if (piece?.coords.x === activePiece?.piece.coords.x && piece?.coords.y === activePiece?.piece.coords.y) {
-						//if the piece is the active piece update s's piece to be the activepiece
-						return {
-							color: s.color,
-							coords: s.coords,
-							piece: activePiece?.piece,
-						};
-					} else {
-						//otherwise leave the piece that is on s alone
-						return {
-							color: s.color,
-							coords: s.coords,
-							piece: piece ? piece : null,
-						};
-					}
-				});
-				return { ...prev, squares: squares, pieces: pieces } as Chessboard;
-			});
-			//successful move, update whose turn it is
+			setBoardData(boardAfterMove(suggestedMove));
+			//update whose turn it is
 			setTurn((prevTurn) => (prevTurn === ChessColor.White ? ChessColor.Black : ChessColor.White));
 		}
 	}
@@ -150,13 +115,13 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 				pieceToMove: activePiece.piece,
 				targetCoords: gridCoords,
 			};
-			attemptTurn(moveAttempt);
-
 			//reset the styles and set active piece to null aka "drop" the element
 			activePiece.element.style.position = "relative";
 			activePiece.element.style.removeProperty("left");
 			activePiece.element.style.removeProperty("top");
 			setActivePiece(null);
+
+			attemptTurn(moveAttempt);
 		}
 	}
 
