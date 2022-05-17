@@ -5,7 +5,10 @@ import { ChessColor } from "./constants/ChessTypes";
 function App() {
 	return (
 		<div className="App">
-			<ChessBoard playerColor={ChessColor.White} />
+			<ChessBoard
+				player={{ userName: "player", color: ChessColor.White }}
+				opponent={{ userName: "computer", color: ChessColor.Black, isComputer: true }}
+			/>
 		</div>
 	);
 }

@@ -36,7 +36,14 @@ export interface Chessboard {
 }
 
 export interface ChessMove {
-	boardData: Chessboard;
+	board: Chessboard;
 	pieceToMove: Piece;
 	targetCoords: Coords;
+	score?: number;
+}
+
+export interface ChessPlayer {
+	userName: string;
+	color: ChessColor;
+	isComputer?: true;
 }

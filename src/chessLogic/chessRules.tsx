@@ -36,12 +36,12 @@ export const isValidMove = (move: ChessMove, validateCheck: boolean = true): boo
 	return isValid;
 };
 
-function getValidPieceMoves(piece: Piece, board: Chessboard): ChessMove[] {
+export const getValidPieceMoves = (piece: Piece, board: Chessboard): ChessMove[] => {
 	const moves: ChessMove[] = [];
 	for (let testX = 1; testX < GRID_SIZE; testX++) {
 		for (let testY = 1; testY < GRID_SIZE; testY++) {
 			const testMove: ChessMove = {
-				boardData: board,
+				board: board,
 				pieceToMove: piece,
 				targetCoords: { x: testX, y: testY },
 			};
@@ -51,17 +51,19 @@ function getValidPieceMoves(piece: Piece, board: Chessboard): ChessMove[] {
 		}
 	}
 	return moves;
-}
+};
 
-function getValidTeamMoves(color: ChessColor, board: Chessboard): ChessMove[] {
+export const getValidTeamMoves = (color: ChessColor, board: Chessboard): ChessMove[] => {
 	const moves: ChessMove[] = [];
 	board.pieces.forEach((p) => {
-		moves.push(...getValidPieceMoves(p, board));
+		if (p.pieceColor === color) {
+			moves.push(...getValidPieceMoves(p, board));
+		}
 	});
 	return moves;
-}
+};
 
-function inCheck(color: ChessColor, board: Chessboard): boolean {
+export const inCheck = (color: ChessColor, board: Chessboard): boolean => {
 	const friendlyKing = board.pieces.find((p) => {
 		return p.pieceType === PieceType.King && p.pieceColor === color;
 	});
@@ -70,18 +72,18 @@ function inCheck(color: ChessColor, board: Chessboard): boolean {
 	const enemyPieces = board.pieces.filter((p) => p.pieceColor !== color);
 	for (let enemyPiece of enemyPieces) {
 		const attackKing = {
-			boardData: board,
+			board: board,
 			pieceToMove: enemyPiece,
 			targetCoords: friendlyKing.coords,
 		};
 		if (isValidMove(attackKing, false)) return true;
 	}
 	return false;
-}
+};
 
 export const boardAfterMove = (move: ChessMove): Chessboard => {
-	const { boardData, pieceToMove, targetCoords } = move;
-	const updatedBoard: Chessboard = JSON.parse(JSON.stringify(boardData)); //create a deep copy of the board
+	const { board, pieceToMove, targetCoords } = move;
+	const updatedBoard: Chessboard = JSON.parse(JSON.stringify(board)); //create a deep copy of the board
 
 	//remove the piece to be captured if there is one
 	updatedBoard.pieces = updatedBoard.pieces.filter((p) => {
@@ -108,12 +110,12 @@ export const boardAfterMove = (move: ChessMove): Chessboard => {
 	return updatedBoard;
 };
 //empessant not done need to make sure the pawn beside moved last turn
-function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+function isEmpessant({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (pieceToMove.pieceType !== PieceType.Pawn) return false;
 	if (pieceToMove.pieceColor === ChessColor.White && pieceToMove.coords.y === 5) {
 		if (isSameCoords({ x: pieceToMove.coords.x + 1, y: 6 }, targetCoords)) {
-			const pieceBeside = pieceAt({ x: pieceToMove.coords.x + 1, y: 5 }, boardData);
-			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x + 1, y: 6 }, boardData);
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x + 1, y: 5 }, board);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x + 1, y: 6 }, board);
 			if (
 				!pieceDiagonal &&
 				pieceBeside &&
@@ -124,8 +126,8 @@ function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boole
 				return true;
 			else return false;
 		} else if (isSameCoords({ x: pieceToMove.coords.x - 1, y: 6 }, targetCoords)) {
-			const pieceBeside = pieceAt({ x: pieceToMove.coords.x - 1, y: 5 }, boardData);
-			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x - 1, y: 6 }, boardData);
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x - 1, y: 5 }, board);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x - 1, y: 6 }, board);
 			if (
 				!pieceDiagonal &&
 				pieceBeside &&
@@ -138,8 +140,8 @@ function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boole
 		}
 	} else if (pieceToMove.pieceColor === ChessColor.Black && pieceToMove.coords.y === 4) {
 		if (isSameCoords({ x: pieceToMove.coords.x + 1, y: 3 }, targetCoords)) {
-			const pieceBeside = pieceAt({ x: pieceToMove.coords.x + 1, y: 4 }, boardData);
-			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x + 1, y: 3 }, boardData);
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x + 1, y: 4 }, board);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x + 1, y: 3 }, board);
 			if (
 				!pieceDiagonal &&
 				pieceBeside &&
@@ -150,8 +152,8 @@ function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boole
 				return true;
 			else return false;
 		} else if (isSameCoords({ x: pieceToMove.coords.x - 1, y: 6 }, targetCoords)) {
-			const pieceBeside = pieceAt({ x: pieceToMove.coords.x - 1, y: 4 }, boardData);
-			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x - 1, y: 3 }, boardData);
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x - 1, y: 4 }, board);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x - 1, y: 3 }, board);
 			if (
 				!pieceDiagonal &&
 				pieceBeside &&
@@ -166,39 +168,39 @@ function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boole
 	return false;
 }
 
-function isValidPawnMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+function isValidPawnMove({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (pieceToMove.pieceType !== PieceType.Pawn) return false;
-	if (isEmpessant({ boardData, pieceToMove, targetCoords })) return true;
+	if (isEmpessant({ board, pieceToMove, targetCoords })) return true;
 	let direction = 1; //1 for white -1 for black
 	if (pieceToMove.pieceColor === ChessColor.Black) direction = -1;
 	//capture
 	if (isSameCoords({ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 1 * direction }, targetCoords)) {
-		const otherPiece = pieceAt({ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 1 * direction }, boardData);
+		const otherPiece = pieceAt({ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 1 * direction }, board);
 		if (!otherPiece) return false;
 		else if (otherPiece.pieceColor !== pieceToMove.pieceColor) return true;
 		else return false;
 	} else if (isSameCoords({ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 1 * direction }, targetCoords)) {
-		const otherPiece = pieceAt({ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 1 * direction }, boardData);
+		const otherPiece = pieceAt({ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 1 * direction }, board);
 		if (!otherPiece) return false;
 		else if (otherPiece.pieceColor !== pieceToMove.pieceColor) return true;
 		else return false;
 	}
 	//normal move
-	let otherPiece = pieceAt({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 1 * direction }, boardData);
+	let otherPiece = pieceAt({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 1 * direction }, board);
 	if (otherPiece) return false; // if there is a piece 1 square in front return false
 	if (isSameCoords({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 1 * direction }, targetCoords)) return true;
 	else if (
 		isSameCoords({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 2 * direction }, targetCoords) &&
 		pieceToMove.moveCount === 0
 	) {
-		otherPiece = pieceAt({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 2 * direction }, boardData);
+		otherPiece = pieceAt({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 2 * direction }, board);
 		return otherPiece ? false : true;
 	}
 
 	return false;
 }
 
-function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+function isValidRookMove({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (!(pieceToMove.pieceType === PieceType.Rook || pieceToMove.pieceType === PieceType.Queen)) return false;
 	if (pieceToMove.coords.x === targetCoords.x) {
 		//target square is in the same column
@@ -207,7 +209,7 @@ function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 			//if there is another piece return false unless there are no pieces between
 			//and the piece is at the target coords and is the enemy piece
 			for (let y = pieceToMove.coords.y + 1; y <= targetCoords.y; y++) {
-				const otherPiece = pieceAt({ x: pieceToMove.coords.x, y: y }, boardData);
+				const otherPiece = pieceAt({ x: pieceToMove.coords.x, y: y }, board);
 				if (otherPiece) {
 					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
 						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
@@ -219,7 +221,7 @@ function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 			return true;
 		} else if (pieceToMove.coords.y > targetCoords.y) {
 			for (let y = pieceToMove.coords.y - 1; y >= targetCoords.y; y--) {
-				const otherPiece = pieceAt({ x: pieceToMove.coords.x, y: y }, boardData);
+				const otherPiece = pieceAt({ x: pieceToMove.coords.x, y: y }, board);
 				if (otherPiece) {
 					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
 						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
@@ -233,7 +235,7 @@ function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 	} else if (pieceToMove.coords.y === targetCoords.y) {
 		if (pieceToMove.coords.x < targetCoords.x) {
 			for (let x = pieceToMove.coords.x + 1; x <= targetCoords.x; x++) {
-				const otherPiece = pieceAt({ x: x, y: pieceToMove.coords.y }, boardData);
+				const otherPiece = pieceAt({ x: x, y: pieceToMove.coords.y }, board);
 				if (otherPiece) {
 					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
 						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
@@ -245,7 +247,7 @@ function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 			return true;
 		} else if (pieceToMove.coords.x > targetCoords.x) {
 			for (let x = pieceToMove.coords.x - 1; x >= targetCoords.x; x--) {
-				const otherPiece = pieceAt({ x: x, y: pieceToMove.coords.y }, boardData);
+				const otherPiece = pieceAt({ x: x, y: pieceToMove.coords.y }, board);
 				if (otherPiece) {
 					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
 						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
@@ -260,7 +262,7 @@ function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 	return false;
 }
 
-function isValidKnightMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+function isValidKnightMove({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (pieceToMove.pieceType !== PieceType.Knight) return false;
 	//possible valid coords of knight moves
 	const testCoords: Coords[] = [
@@ -277,17 +279,17 @@ function isValidKnightMove({ boardData, pieceToMove, targetCoords }: ChessMove):
 		return isSameCoords(targetCoords, c);
 	});
 	if (!testCoord) return false; //target is not a possible knight move
-	const testPiece = pieceAt(testCoord, boardData); //find the piece at the target square
+	const testPiece = pieceAt(testCoord, board); //find the piece at the target square
 	if (!testPiece) return true; //target square empty
 	else if (testPiece.pieceColor !== pieceToMove.pieceColor) return true; //capture piece at target square
 	else return false; //square held by friendly piece
 }
 
-function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+function isValidBishopMove({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (!(pieceToMove.pieceType === PieceType.Bishop || pieceToMove.pieceType === PieceType.Queen)) return false;
 	if (targetCoords.x > pieceToMove.coords.x && targetCoords.y > pieceToMove.coords.y) {
 		for (let x = pieceToMove.coords.x + 1, y = pieceToMove.coords.y + 1; x <= targetCoords.x, y <= targetCoords.y; x++, y++) {
-			const otherPiece = pieceAt({ x, y }, boardData);
+			const otherPiece = pieceAt({ x, y }, board);
 			if (otherPiece) {
 				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
 				else return false;
@@ -295,7 +297,7 @@ function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove):
 		}
 	} else if (targetCoords.x < pieceToMove.coords.x && targetCoords.y > pieceToMove.coords.y) {
 		for (let x = pieceToMove.coords.x - 1, y = pieceToMove.coords.y + 1; x >= targetCoords.x, y <= targetCoords.y; x--, y++) {
-			const otherPiece = pieceAt({ x, y }, boardData);
+			const otherPiece = pieceAt({ x, y }, board);
 			if (otherPiece) {
 				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
 				else return false;
@@ -303,7 +305,7 @@ function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove):
 		}
 	} else if (targetCoords.x > pieceToMove.coords.x && targetCoords.y < pieceToMove.coords.y) {
 		for (let x = pieceToMove.coords.x + 1, y = pieceToMove.coords.y - 1; x <= targetCoords.x, y >= targetCoords.y; x++, y--) {
-			const otherPiece = pieceAt({ x, y }, boardData);
+			const otherPiece = pieceAt({ x, y }, board);
 			if (otherPiece) {
 				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
 				else return false;
@@ -311,7 +313,7 @@ function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove):
 		}
 	} else if (targetCoords.x < pieceToMove.coords.x && targetCoords.y < pieceToMove.coords.y) {
 		for (let x = pieceToMove.coords.x - 1, y = pieceToMove.coords.y - 1; x >= targetCoords.x, y >= targetCoords.y; x--, y--) {
-			const otherPiece = pieceAt({ x, y }, boardData);
+			const otherPiece = pieceAt({ x, y }, board);
 			if (otherPiece) {
 				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
 				else return false;
@@ -326,7 +328,7 @@ function isValidQueenMove(move: ChessMove): boolean {
 	return isValidBishopMove(move) || isValidRookMove(move);
 }
 
-function isValidKingMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+function isValidKingMove({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	if (pieceToMove.pieceType !== PieceType.King) return false;
 	const testCoords: Coords[] = [
 		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y - 1 },
@@ -343,7 +345,7 @@ function isValidKingMove({ boardData, pieceToMove, targetCoords }: ChessMove): b
 	});
 
 	if (!testCoord) return false; //target is not a possible knight move
-	const testPiece = pieceAt(testCoord, boardData); //find the piece at the target square
+	const testPiece = pieceAt(testCoord, board); //find the piece at the target square
 	if (!testPiece) return true; //target square empty
 	else if (testPiece.pieceColor !== pieceToMove.pieceColor) return true; //capture piece at target square
 	else return false; //square held by friendly piece

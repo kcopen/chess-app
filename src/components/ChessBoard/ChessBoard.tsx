@@ -1,21 +1,23 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChessSquare } from "../ChessSquare/ChessSquare";
 import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../constants/config";
-import { Chessboard, ChessColor, ChessMove, Coords, Piece, Square } from "../../constants/ChessTypes";
+import { Chessboard, ChessColor, ChessMove, ChessPlayer, Coords, Piece, Square } from "../../constants/ChessTypes";
 import "./ChessBoard.css";
 import { initPieces, initSquares } from "../../chessLogic/boardInit";
-import { boardAfterMove, inGridBounds, isValidMove } from "../../chessLogic/chessRules";
+import { boardAfterMove, getValidTeamMoves, inGridBounds, isValidMove } from "../../chessLogic/chessRules";
+import { getEngineMove } from "../../chessLogic/chessAI";
 
 interface Props {
-	playerColor: ChessColor;
+	player: ChessPlayer;
+	opponent: ChessPlayer;
 }
 
-export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
+export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 	const chessBoardRef = useRef<HTMLDivElement>(null);
 
 	const [boardData, setBoardData] = useState<Chessboard>(() => {
 		const pieces = initPieces();
-		const squares = initSquares(pieces, playerColor);
+		const squares = initSquares(pieces, player.color);
 		return { squares: squares, pieces: pieces };
 	});
 	const [turn, setTurn] = useState<ChessColor>(ChessColor.White);
@@ -26,13 +28,32 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 		grabCoords: { gridX: number; gridY: number };
 	} | null>(null);
 
+	//check for win
+	useEffect(() => {
+		if (turn === ChessColor.Black) {
+			if (getValidTeamMoves(ChessColor.Black, boardData).length === 0) console.log("white wins");
+		} else if (turn === ChessColor.White) {
+			if (getValidTeamMoves(ChessColor.White, boardData).length === 0) console.log("black wins");
+		}
+	});
+
+	useEffect(() => {
+		if (turn !== player.color) {
+			if (opponent.isComputer) {
+				const computerMove = getEngineMove(opponent.color, boardData);
+				computerMove && attemptTurn(computerMove);
+			}
+		}
+	}, [turn]);
+
 	//attempt to take turn
 	function attemptTurn(suggestedMove: ChessMove) {
-		//make sure its the players turn and they are using their own piece
-		//if (turn !== playerColor || activePiece?.piece.pieceColor !== playerColor) return;
+		//make sure its the players turn
+		if (turn !== suggestedMove.pieceToMove.pieceColor) return;
 		if (isValidMove(suggestedMove)) {
 			//move is valid so update the board
 			setBoardData(boardAfterMove(suggestedMove));
+			console.log(boardData);
 			//update whose turn it is
 			setTurn((prevTurn) => (prevTurn === ChessColor.White ? ChessColor.Black : ChessColor.White));
 		}
@@ -51,16 +72,16 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 			const x = e.clientX - PIECE_SIZE / 2;
 			const y = e.clientY - PIECE_SIZE / 2;
 
-			//render the element at the mouse cursor
-			element.style.position = "absolute";
-			element.style.left = `${x}px`;
-			element.style.top = `${y}px`;
-
-			//get the current piece being held and update activePiece state to it
 			const currentPiece = boardData.pieces.find((p) => {
-				return p.coords.x === gridX && p.coords.y === gridY;
+				return p.coords.x === gridX && p.coords.y === gridY && p.pieceColor === player.color;
 			});
-			currentPiece && setActivePiece({ piece: currentPiece, element: element, grabCoords: { gridX: gridX, gridY: gridY } });
+			if (currentPiece) {
+				//render the element at the mouse cursor
+				element.style.position = "absolute";
+				element.style.left = `${x}px`;
+				element.style.top = `${y}px`;
+				setActivePiece({ piece: currentPiece, element: element, grabCoords: { gridX: gridX, gridY: gridY } });
+			}
 		}
 	}
 
@@ -111,7 +132,7 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 
 			//move being attempted by player
 			const moveAttempt: ChessMove = {
-				boardData: boardData,
+				board: boardData,
 				pieceToMove: activePiece.piece,
 				targetCoords: gridCoords,
 			};
