@@ -36,6 +36,31 @@ export const isValidMove = (move: ChessMove, validateCheck: boolean = true): boo
 	return isValid;
 };
 
+function getValidPieceMoves(piece: Piece, board: Chessboard): ChessMove[] {
+	const moves: ChessMove[] = [];
+	for (let testX = 1; testX < GRID_SIZE; testX++) {
+		for (let testY = 1; testY < GRID_SIZE; testY++) {
+			const testMove: ChessMove = {
+				boardData: board,
+				pieceToMove: piece,
+				targetCoords: { x: testX, y: testY },
+			};
+			if (isValidMove(testMove)) {
+				moves.push(testMove);
+			}
+		}
+	}
+	return moves;
+}
+
+function getValidTeamMoves(color: ChessColor, board: Chessboard): ChessMove[] {
+	const moves: ChessMove[] = [];
+	board.pieces.forEach((p) => {
+		moves.push(...getValidPieceMoves(p, board));
+	});
+	return moves;
+}
+
 function inCheck(color: ChessColor, board: Chessboard): boolean {
 	const friendlyKing = board.pieces.find((p) => {
 		return p.pieceType === PieceType.King && p.pieceColor === color;
