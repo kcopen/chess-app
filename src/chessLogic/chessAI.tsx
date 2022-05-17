@@ -1,5 +1,5 @@
 import { Chessboard, ChessColor, ChessMove, PieceType } from "../constants/ChessTypes";
-import { getValidTeamMoves, boardAfterMove, inCheck, pieceAt } from "./chessRules";
+import { getValidTeamMoves, boardAfterMove, inCheck, pieceAt, inCheckMate } from "./chessRules";
 
 export const getEngineMove = (team: ChessColor, board: Chessboard): ChessMove | undefined => {
 	const possibleMoves: ChessMove[] = getValidTeamMoves(team, board);
@@ -27,12 +27,17 @@ function scoreMove(move: ChessMove): number {
 	//add +1 to score for every square controlled
 	score += getValidTeamMoves(teamColor, newBoard).length;
 	//if the enemy is put in check
-	if (inCheck(enemyColor, newBoard)) score += 10;
+	if (inCheck(enemyColor, newBoard)) {
+		score += 10;
+	}
 	//if there is a piece to capture
 	if (pieceToCapture) {
 		score += getPieceValue(pieceToCapture.pieceType);
 	}
 
+	if (inCheckMate(enemyColor, newBoard)) {
+		score += 1000;
+	}
 	return score;
 }
 

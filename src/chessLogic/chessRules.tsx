@@ -81,6 +81,11 @@ export const inCheck = (color: ChessColor, board: Chessboard): boolean => {
 	return false;
 };
 
+export const inCheckMate = (color: ChessColor, board: Chessboard): boolean => {
+	if (inCheck(color, board) && getValidTeamMoves(color, board).length === 0) return true;
+	else return false;
+};
+
 export const boardAfterMove = (move: ChessMove): Chessboard => {
 	const { board, pieceToMove, targetCoords } = move;
 	const updatedBoard: Chessboard = JSON.parse(JSON.stringify(board)); //create a deep copy of the board
