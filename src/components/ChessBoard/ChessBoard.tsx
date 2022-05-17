@@ -35,10 +35,11 @@ export const ChessBoard: React.FC<Props> = ({ playerColor }: Props) => {
 			setBoardData((prev) => {
 				//update the pieces
 				const pieces = prev.pieces.map((p) => {
-					//if p is the activePiece then update its coords
+					//if p is the activePiece then update its coords and moveCount
 					if (p.coords.x === activePiece?.grabCoords.gridX && p.coords.y === activePiece?.grabCoords.gridY) {
 						p.coords.x = suggestedMove.targetCoords.x;
 						p.coords.y = suggestedMove.targetCoords.y;
+						p.moveCount = p.moveCount + 1;
 					}
 					return p;
 				});

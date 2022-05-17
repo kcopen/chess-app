@@ -9,6 +9,7 @@ export const initPieces = (): Piece[] => {
 			x: 5,
 			y: 4,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Knight,
@@ -17,6 +18,7 @@ export const initPieces = (): Piece[] => {
 			x: 2,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Bishop,
@@ -25,6 +27,7 @@ export const initPieces = (): Piece[] => {
 			x: 3,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.King,
@@ -33,6 +36,7 @@ export const initPieces = (): Piece[] => {
 			x: 4,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Queen,
@@ -41,6 +45,7 @@ export const initPieces = (): Piece[] => {
 			x: 5,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Bishop,
@@ -49,6 +54,7 @@ export const initPieces = (): Piece[] => {
 			x: 6,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Knight,
@@ -57,6 +63,7 @@ export const initPieces = (): Piece[] => {
 			x: 7,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Rook,
@@ -65,6 +72,7 @@ export const initPieces = (): Piece[] => {
 			x: 8,
 			y: 1,
 		},
+		moveCount: 0,
 	});
 	for (let i = 1; i <= 8; i++) {
 		pieces.push({
@@ -74,6 +82,7 @@ export const initPieces = (): Piece[] => {
 				x: i,
 				y: 2,
 			},
+			moveCount: 0,
 		});
 	}
 
@@ -84,6 +93,7 @@ export const initPieces = (): Piece[] => {
 			x: 1,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Knight,
@@ -92,6 +102,7 @@ export const initPieces = (): Piece[] => {
 			x: 2,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Bishop,
@@ -100,6 +111,7 @@ export const initPieces = (): Piece[] => {
 			x: 3,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.King,
@@ -108,6 +120,7 @@ export const initPieces = (): Piece[] => {
 			x: 4,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Queen,
@@ -116,6 +129,7 @@ export const initPieces = (): Piece[] => {
 			x: 5,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Bishop,
@@ -124,6 +138,7 @@ export const initPieces = (): Piece[] => {
 			x: 6,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Knight,
@@ -132,6 +147,7 @@ export const initPieces = (): Piece[] => {
 			x: 7,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	pieces.push({
 		pieceType: PieceType.Rook,
@@ -140,6 +156,7 @@ export const initPieces = (): Piece[] => {
 			x: 8,
 			y: 8,
 		},
+		moveCount: 0,
 	});
 	for (let i = 1; i <= 8; i++) {
 		pieces.push({
@@ -149,6 +166,7 @@ export const initPieces = (): Piece[] => {
 				x: i,
 				y: 7,
 			},
+			moveCount: 0,
 		});
 	}
 	return pieces;

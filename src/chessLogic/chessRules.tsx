@@ -1,60 +1,200 @@
-import { ChessMove, PieceType, Square, Chessboard, Piece, Coords } from "../constants/ChessTypes";
+import { JsxTagNamePropertyAccess } from "typescript";
+import { ChessMove, PieceType, Square, Chessboard, Piece, Coords, ChessColor } from "../constants/ChessTypes";
 import { GRID_SIZE } from "../constants/config";
 
+//todo make sure king isnt in check before returning
 export const isValidMove = (move: ChessMove): boolean => {
 	if (!inGridBounds(move.targetCoords)) return false;
 	if (isSameCoords(move.pieceToMove.coords, move.targetCoords)) return false;
+	let isValid = false;
 	switch (move.pieceToMove.pieceType) {
 		case PieceType.Pawn:
-			return isValidPawnMove(move);
+			isValid = isValidPawnMove(move);
+			break;
 		case PieceType.Rook:
-			return isValidRookMove(move);
+			isValid = isValidRookMove(move);
+			break;
 		case PieceType.Knight:
-			return isValidKnightMove(move);
+			isValid = isValidKnightMove(move);
+			break;
 		case PieceType.Bishop:
-			return isValidBishopMove(move);
+			isValid = isValidBishopMove(move);
+			break;
 		case PieceType.King:
-			return isValidKingMove(move);
+			isValid = isValidKingMove(move);
+			break;
 		case PieceType.Queen:
-			return isValidQueenMove(move);
+			isValid = isValidQueenMove(move);
+			break;
 		default:
-			return false;
+			isValid = false;
 	}
+	generateBoardAfterMove(move);
+	return isValid;
 };
 
+function generateBoardAfterMove({ boardData, pieceToMove, targetCoords, isEmpessante }: ChessMove): Chessboard {
+	const updatedBoard: Chessboard = JSON.parse(JSON.stringify(boardData)); //create a deep copy of the board
+	const updatedPieces: Piece[] = updatedBoard.pieces;
+
+	return updatedBoard;
+}
+//empessant not done need to make sure the pawn beside moved last turn
+function isEmpessant({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+	if (pieceToMove.pieceType !== PieceType.Pawn) return false;
+	if (pieceToMove.pieceColor === ChessColor.White && pieceToMove.coords.y === 5) {
+		if (isSameCoords({ x: pieceToMove.coords.x + 1, y: 6 }, targetCoords)) {
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x + 1, y: 5 }, boardData);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x + 1, y: 6 }, boardData);
+			if (
+				!pieceDiagonal &&
+				pieceBeside &&
+				pieceBeside.pieceType === PieceType.Pawn &&
+				pieceBeside.pieceColor !== pieceToMove.pieceColor &&
+				pieceBeside.moveCount === 1
+			)
+				return true;
+			else return false;
+		} else if (isSameCoords({ x: pieceToMove.coords.x - 1, y: 6 }, targetCoords)) {
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x - 1, y: 5 }, boardData);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x - 1, y: 6 }, boardData);
+			if (
+				!pieceDiagonal &&
+				pieceBeside &&
+				pieceBeside.pieceType === PieceType.Pawn &&
+				pieceBeside.pieceColor !== pieceToMove.pieceColor &&
+				pieceBeside.moveCount === 1
+			)
+				return true;
+			else return false;
+		}
+	} else if (pieceToMove.pieceColor === ChessColor.Black && pieceToMove.coords.y === 4) {
+		if (isSameCoords({ x: pieceToMove.coords.x + 1, y: 3 }, targetCoords)) {
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x + 1, y: 4 }, boardData);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x + 1, y: 3 }, boardData);
+			if (
+				!pieceDiagonal &&
+				pieceBeside &&
+				pieceBeside.pieceType === PieceType.Pawn &&
+				pieceBeside.pieceColor !== pieceToMove.pieceColor &&
+				pieceBeside.moveCount === 1
+			)
+				return true;
+			else return false;
+		} else if (isSameCoords({ x: pieceToMove.coords.x - 1, y: 6 }, targetCoords)) {
+			const pieceBeside = pieceAt({ x: pieceToMove.coords.x - 1, y: 4 }, boardData);
+			const pieceDiagonal = pieceAt({ x: pieceToMove.coords.x - 1, y: 3 }, boardData);
+			if (
+				!pieceDiagonal &&
+				pieceBeside &&
+				pieceBeside.pieceType === PieceType.Pawn &&
+				pieceBeside.pieceColor !== pieceToMove.pieceColor &&
+				pieceBeside.moveCount === 1
+			)
+				return true;
+			else return false;
+		}
+	}
+	return false;
+}
+
 function isValidPawnMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	throw new Error("Function not implemented.");
+	if (pieceToMove.pieceType !== PieceType.Pawn) return false;
+	if (isEmpessant({ boardData, pieceToMove, targetCoords })) return true;
+	let direction = 1; //1 for white -1 for black
+	if (pieceToMove.pieceColor === ChessColor.Black) direction = -1;
+	//capture
+	if (isSameCoords({ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 1 * direction }, targetCoords)) {
+		const otherPiece = pieceAt({ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 1 * direction }, boardData);
+		if (!otherPiece) return false;
+		else if (otherPiece.pieceColor !== pieceToMove.pieceColor) return true;
+		else return false;
+	} else if (isSameCoords({ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 1 * direction }, targetCoords)) {
+		const otherPiece = pieceAt({ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 1 * direction }, boardData);
+		if (!otherPiece) return false;
+		else if (otherPiece.pieceColor !== pieceToMove.pieceColor) return true;
+		else return false;
+	}
+	//normal move
+	let otherPiece = pieceAt({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 1 * direction }, boardData);
+	if (otherPiece) return false; // if there is a piece 1 square in front return false
+	if (isSameCoords({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 1 * direction }, targetCoords)) return true;
+	else if (
+		isSameCoords({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 2 * direction }, targetCoords) &&
+		pieceToMove.moveCount === 0
+	) {
+		otherPiece = pieceAt({ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 2 * direction }, boardData);
+		return otherPiece ? false : true;
+	}
+
+	return false;
 }
 
 function isValidRookMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+	if (pieceToMove.pieceType !== PieceType.Rook) return false;
 	if (pieceToMove.coords.x === targetCoords.x) {
-		//check for pieces between the piece and its target square
+		//target square is in the same column
 		if (pieceToMove.coords.y < targetCoords.y) {
-			for (let y = pieceToMove.coords.y + 1; y < targetCoords.y; y++) {
-				if (pieceAt({ x: pieceToMove.coords.x, y: y }, boardData)?.pieceColor === pieceToMove.pieceColor) return false;
+			//check each square for pieces between the pieceToMove and the targetCoords
+			//if there is another piece return false unless there are no pieces between
+			//and the piece is at the target coords and is the enemy piece
+			for (let y = pieceToMove.coords.y + 1; y <= targetCoords.y; y++) {
+				const otherPiece = pieceAt({ x: pieceToMove.coords.x, y: y }, boardData);
+				if (otherPiece) {
+					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
+						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
+						else return false;
+					}
+					return false;
+				}
 			}
+			return true;
 		} else if (pieceToMove.coords.y > targetCoords.y) {
-			for (let y = targetCoords.y; y < pieceToMove.coords.y; y++) {
-				if (pieceAt({ x: pieceToMove.coords.x, y: y }, boardData)?.pieceColor === pieceToMove.pieceColor) return false;
+			for (let y = pieceToMove.coords.y - 1; y >= targetCoords.y; y--) {
+				const otherPiece = pieceAt({ x: pieceToMove.coords.x, y: y }, boardData);
+				if (otherPiece) {
+					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
+						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
+						else return false;
+					}
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
 	} else if (pieceToMove.coords.y === targetCoords.y) {
-		//check for pieces between the piece and its target square
 		if (pieceToMove.coords.x < targetCoords.x) {
-			for (let x = targetCoords.x; x > pieceToMove.coords.x; x--) {
-				if (pieceAt({ x: x, y: pieceToMove.coords.y }, boardData)?.pieceColor === pieceToMove.pieceColor) return false;
+			for (let x = pieceToMove.coords.x + 1; x <= targetCoords.x; x++) {
+				const otherPiece = pieceAt({ x: x, y: pieceToMove.coords.y }, boardData);
+				if (otherPiece) {
+					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
+						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
+						else return false;
+					}
+					return false;
+				}
 			}
+			return true;
 		} else if (pieceToMove.coords.x > targetCoords.x) {
-			for (let x = targetCoords.x; x < pieceToMove.coords.x; x++) {
-				if (pieceAt({ x: x, y: pieceToMove.coords.y }, boardData)?.pieceColor === pieceToMove.pieceColor) return false;
+			for (let x = pieceToMove.coords.x - 1; x >= targetCoords.x; x--) {
+				const otherPiece = pieceAt({ x: x, y: pieceToMove.coords.y }, boardData);
+				if (otherPiece) {
+					if (otherPiece.pieceColor !== pieceToMove.pieceColor) {
+						if (isSameCoords(otherPiece.coords, targetCoords)) return true;
+						else return false;
+					}
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
-	} else return false;
+	}
+	return false;
 }
 
 function isValidKnightMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+	if (pieceToMove.pieceType !== PieceType.Knight) return false;
+	//possible valid coords of knight moves
 	const testCoords: Coords[] = [
 		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 2 },
 		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y - 2 },
@@ -65,25 +205,80 @@ function isValidKnightMove({ boardData, pieceToMove, targetCoords }: ChessMove):
 		{ x: pieceToMove.coords.x - 2, y: pieceToMove.coords.y + 1 },
 		{ x: pieceToMove.coords.x - 2, y: pieceToMove.coords.y - 1 },
 	];
-	for (const coord of testCoords) {
-		if (!isSameCoords(targetCoords, coord)) continue;
-		const testPiece = pieceAt(coord, boardData);
-		if (!testPiece) return true;
-		else if (testPiece.pieceColor !== pieceToMove.pieceColor) return true;
+	const testCoord: Coords | undefined = testCoords.find((c) => {
+		return isSameCoords(targetCoords, c);
+	});
+	if (!testCoord) return false; //target is not a possible knight move
+	const testPiece = pieceAt(testCoord, boardData); //find the piece at the target square
+	if (!testPiece) return true; //target square empty
+	else if (testPiece.pieceColor !== pieceToMove.pieceColor) return true; //capture piece at target square
+	else return false; //square held by friendly piece
+}
+
+function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
+	if (pieceToMove.pieceType !== PieceType.Bishop) return false;
+	if (targetCoords.x > pieceToMove.coords.x && targetCoords.y > pieceToMove.coords.y) {
+		for (let x = pieceToMove.coords.x + 1, y = pieceToMove.coords.y + 1; x <= targetCoords.x, y <= targetCoords.y; x++, y++) {
+			const otherPiece = pieceAt({ x, y }, boardData);
+			if (otherPiece) {
+				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
+				else return false;
+			} else if (isSameCoords({ x, y }, targetCoords)) return true;
+		}
+	} else if (targetCoords.x < pieceToMove.coords.x && targetCoords.y > pieceToMove.coords.y) {
+		for (let x = pieceToMove.coords.x - 1, y = pieceToMove.coords.y + 1; x >= targetCoords.x, y <= targetCoords.y; x--, y++) {
+			const otherPiece = pieceAt({ x, y }, boardData);
+			if (otherPiece) {
+				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
+				else return false;
+			} else if (isSameCoords({ x, y }, targetCoords)) return true;
+		}
+	} else if (targetCoords.x > pieceToMove.coords.x && targetCoords.y < pieceToMove.coords.y) {
+		for (let x = pieceToMove.coords.x + 1, y = pieceToMove.coords.y - 1; x <= targetCoords.x, y >= targetCoords.y; x++, y--) {
+			const otherPiece = pieceAt({ x, y }, boardData);
+			if (otherPiece) {
+				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
+				else return false;
+			} else if (isSameCoords({ x, y }, targetCoords)) return true;
+		}
+	} else if (targetCoords.x < pieceToMove.coords.x && targetCoords.y < pieceToMove.coords.y) {
+		for (let x = pieceToMove.coords.x - 1, y = pieceToMove.coords.y - 1; x >= targetCoords.x, y >= targetCoords.y; x--, y--) {
+			const otherPiece = pieceAt({ x, y }, boardData);
+			if (otherPiece) {
+				if (otherPiece.pieceColor !== pieceToMove.pieceColor && isSameCoords({ x, y }, targetCoords)) return true;
+				else return false;
+			} else if (isSameCoords({ x, y }, targetCoords)) return true;
+		}
 	}
 	return false;
 }
 
-function isValidBishopMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	return true;
-}
-
-function isValidQueenMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	return true;
+function isValidQueenMove(move: ChessMove): boolean {
+	if (move.pieceToMove.pieceType !== PieceType.Queen) return false;
+	return isValidBishopMove(move) || isValidRookMove(move);
 }
 
 function isValidKingMove({ boardData, pieceToMove, targetCoords }: ChessMove): boolean {
-	return true;
+	if (pieceToMove.pieceType !== PieceType.King) return false;
+	const testCoords: Coords[] = [
+		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y - 1 },
+		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y },
+		{ x: pieceToMove.coords.x + 1, y: pieceToMove.coords.y + 1 },
+		{ x: pieceToMove.coords.x, y: pieceToMove.coords.y - 1 },
+		{ x: pieceToMove.coords.x, y: pieceToMove.coords.y + 1 },
+		{ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y - 1 },
+		{ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y },
+		{ x: pieceToMove.coords.x - 1, y: pieceToMove.coords.y + 1 },
+	];
+	const testCoord: Coords | undefined = testCoords.find((c) => {
+		return isSameCoords(targetCoords, c);
+	});
+
+	if (!testCoord) return false; //target is not a possible knight move
+	const testPiece = pieceAt(testCoord, boardData); //find the piece at the target square
+	if (!testPiece) return true; //target square empty
+	else if (testPiece.pieceColor !== pieceToMove.pieceColor) return true; //capture piece at target square
+	else return false; //square held by friendly piece
 }
 
 //---------------coord functions---------------------------------------------------------

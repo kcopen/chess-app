@@ -21,6 +21,7 @@ export interface Piece {
 	pieceType: PieceType;
 	pieceColor: ChessColor;
 	coords: Coords;
+	moveCount: number;
 }
 
 export interface Square {
@@ -38,4 +39,5 @@ export interface ChessMove {
 	boardData: Chessboard;
 	pieceToMove: Piece;
 	targetCoords: Coords;
+	isEmpessante?: boolean;
 }
