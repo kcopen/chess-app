@@ -5,7 +5,7 @@ import { Chessboard, ChessColor, ChessMove, ChessPlayer, Coords, Piece, Square }
 import "./ChessBoard.css";
 import { initPieces, initSquares } from "../../chessLogic/boardInit";
 import { boardAfterMove, getValidTeamMoves, inGridBounds, isValidMove } from "../../chessLogic/chessRules";
-import { getEngineMove } from "../../chessLogic/chessAI";
+import { getBestMove } from "../../chessLogic/chessAI";
 
 interface Props {
 	player: ChessPlayer;
@@ -14,7 +14,6 @@ interface Props {
 
 export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 	const chessBoardRef = useRef<HTMLDivElement>(null);
-
 	const [boardData, setBoardData] = useState<Chessboard>(() => {
 		const pieces = initPieces();
 		const squares = initSquares(pieces, player.color);
@@ -28,20 +27,23 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 		grabCoords: { gridX: number; gridY: number };
 	} | null>(null);
 
-	//check for win
 	useEffect(() => {
 		if (turn === ChessColor.Black) {
-			if (getValidTeamMoves(ChessColor.Black, boardData).length === 0) console.log("white wins");
+			if (getValidTeamMoves(ChessColor.Black, boardData).length === 0) {
+				console.log("white wins");
+				return;
+			}
 		} else if (turn === ChessColor.White) {
-			if (getValidTeamMoves(ChessColor.White, boardData).length === 0) console.log("black wins");
+			if (getValidTeamMoves(ChessColor.White, boardData).length === 0) {
+				console.log("black wins");
+				return;
+			}
 		}
-	});
-
-	useEffect(() => {
 		if (turn !== player.color) {
 			if (opponent.isComputer) {
-				const computerMove = getEngineMove(opponent.color, boardData);
-				computerMove && attemptTurn(computerMove);
+				const computerMove = getBestMove(opponent.color, boardData);
+				if (computerMove) attemptTurn(computerMove);
+				else computerMove && attemptTurn(computerMove);
 			}
 		}
 	}, [turn]);
@@ -53,7 +55,6 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 		if (isValidMove(suggestedMove)) {
 			//move is valid so update the board
 			setBoardData(boardAfterMove(suggestedMove));
-			console.log(boardData);
 			//update whose turn it is
 			setTurn((prevTurn) => (prevTurn === ChessColor.White ? ChessColor.Black : ChessColor.White));
 		}
@@ -130,16 +131,18 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / PIECE_SIZE));
 			const gridCoords: Coords = { x: gridX, y: gridY };
 
+			//reset the styles and set active piece to null aka "drop" the element
+			activePiece.element.style.position = "relative";
+			activePiece.element.style.removeProperty("left");
+			activePiece.element.style.removeProperty("top");
+
 			//move being attempted by player
 			const moveAttempt: ChessMove = {
 				board: boardData,
 				pieceToMove: activePiece.piece,
 				targetCoords: gridCoords,
 			};
-			//reset the styles and set active piece to null aka "drop" the element
-			activePiece.element.style.position = "relative";
-			activePiece.element.style.removeProperty("left");
-			activePiece.element.style.removeProperty("top");
+
 			setActivePiece(null);
 
 			attemptTurn(moveAttempt);
@@ -163,6 +166,10 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 			onMouseMove={(e) => movePiece(e)}
 			onMouseUp={(e) => dropPiece(e)}
 			ref={chessBoardRef}
+			style={{
+				width: BOARD_SIZE,
+				height: BOARD_SIZE,
+			}}
 		>
 			{[...squareElements]}
 		</div>

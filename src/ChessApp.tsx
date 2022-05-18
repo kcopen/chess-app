@@ -1,10 +1,10 @@
-import "./App.css";
+import "./ChessApp.css";
 import { ChessBoard } from "./components/ChessBoard/ChessBoard";
 import { ChessColor } from "./constants/ChessTypes";
 
-function App() {
+function ChessApp() {
 	return (
-		<div className="App">
+		<div className="chess-app">
 			<ChessBoard
 				player={{ userName: "player", color: ChessColor.White }}
 				opponent={{ userName: "computer", color: ChessColor.Black, isComputer: true }}
@@ -13,4 +13,4 @@ function App() {
 	);
 }
 
-export default App;
+export default ChessApp;

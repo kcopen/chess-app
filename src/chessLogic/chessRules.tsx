@@ -63,22 +63,26 @@ export const getValidTeamMoves = (color: ChessColor, board: Chessboard): ChessMo
 	return moves;
 };
 
+export const isPieceUnderAttack = (piece: Piece, board: Chessboard): boolean => {
+	const enemyPieces = board.pieces.filter((p) => p.pieceColor !== piece.pieceColor);
+	for (let enemyPiece of enemyPieces) {
+		const attackPiece = {
+			board: board,
+			pieceToMove: enemyPiece,
+			targetCoords: piece.coords,
+		};
+		if (isValidMove(attackPiece, false)) return true;
+	}
+	return false;
+};
+
 export const inCheck = (color: ChessColor, board: Chessboard): boolean => {
 	const friendlyKing = board.pieces.find((p) => {
 		return p.pieceType === PieceType.King && p.pieceColor === color;
 	});
 	if (!friendlyKing) return false;
 
-	const enemyPieces = board.pieces.filter((p) => p.pieceColor !== color);
-	for (let enemyPiece of enemyPieces) {
-		const attackKing = {
-			board: board,
-			pieceToMove: enemyPiece,
-			targetCoords: friendlyKing.coords,
-		};
-		if (isValidMove(attackKing, false)) return true;
-	}
-	return false;
+	return isPieceUnderAttack(friendlyKing, board);
 };
 
 export const inCheckMate = (color: ChessColor, board: Chessboard): boolean => {
