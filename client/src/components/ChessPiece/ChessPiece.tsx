@@ -1,6 +1,6 @@
 import React from "react";
-import { PieceType } from "../../constants/ChessTypes";
-import { PIECE_SIZE } from "../../constants/config";
+import { PieceType } from "../../shared-libs/chessEngine/ChessTypes";
+import { PIECE_SIZE } from "../../shared-libs/config";
 import "./ChessPiece.css";
 
 interface Props {

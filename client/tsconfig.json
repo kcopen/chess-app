@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-  ]
+, "src/shared-libs/socketTypes.ts", "../server/chessEngine", "src/shared-libs/config.tsx"  ]
 }

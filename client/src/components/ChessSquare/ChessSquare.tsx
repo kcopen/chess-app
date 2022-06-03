@@ -1,8 +1,8 @@
 import React from "react";
 import { ChessPiece } from "../ChessPiece/ChessPiece";
-import { square_color } from "../../chessLogic/squareLogic";
-import { PieceType } from "../../constants/ChessTypes";
+import { ChessColor, PieceType } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessSquare.css";
+import { BLACK_SQUARE_COLOR, WHITE_SQUARE_COLOR } from "../../shared-libs/config";
 
 interface Props {
 	squareColor: string;
@@ -13,8 +13,13 @@ interface Props {
 }
 
 export const ChessSquare: React.FC<Props> = ({ squareColor, piece }: Props) => {
+	const square_color = (color: string) => {
+		if (color === "white") return WHITE_SQUARE_COLOR;
+		if (color === "black") return BLACK_SQUARE_COLOR;
+	};
+
 	const squareStyles = {
-		backgroundColor: square_color(squareColor),
+		backgroundColor: squareColor === ChessColor.White ? WHITE_SQUARE_COLOR : BLACK_SQUARE_COLOR,
 	};
 
 	const pieceElement = () => {

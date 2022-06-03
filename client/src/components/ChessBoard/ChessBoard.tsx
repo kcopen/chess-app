@@ -1,25 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChessSquare } from "../ChessSquare/ChessSquare";
-import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../constants/config";
-import { Chessboard, ChessColor, ChessMove, ChessPlayer, Coords, Piece, Square } from "../../constants/ChessTypes";
+import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../shared-libs/config";
+import { Chessboard, ChessColor, ChessMove, ChessPlayer, Coords, Piece, Square } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessBoard.css";
-import { initPieces, initSquares } from "../../chessLogic/boardInit";
-import { boardAfterMove, getValidTeamMoves, inGridBounds, isValidMove } from "../../chessLogic/chessRules";
-import { getBestMove } from "../../chessLogic/chessAI";
+import { SocketContext } from "../../ChessApp";
+import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
+import { Socket } from "socket.io-client";
+import { UserProfile } from "../../shared-libs/UserProfile";
+import { inGridBounds } from "../../shared-libs/chessEngine/chessRules";
+import { initBoard } from "../../shared-libs/chessEngine/boardInit";
 
 interface Props {
-	player: ChessPlayer;
-	opponent: ChessPlayer;
+	userProfile: UserProfile;
+	room: string;
+	playerColor: ChessColor | undefined;
 }
 
-export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
+export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: Props) => {
+	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const chessBoardRef = useRef<HTMLDivElement>(null);
-	const [boardData, setBoardData] = useState<Chessboard>(() => {
-		const pieces = initPieces();
-		const squares = initSquares(pieces, player.color);
-		return { squares: squares, pieces: pieces };
-	});
-	const [turn, setTurn] = useState<ChessColor>(ChessColor.White);
+	const [board, setBoard] = useState<Chessboard>(initBoard());
+
+	useEffect(() => {
+		socket.on("board_update", (updatedBoard: Chessboard) => {
+			console.log(updatedBoard);
+			setBoard(updatedBoard);
+		});
+	}, [socket]);
 
 	const [activePiece, setActivePiece] = useState<{
 		piece: Piece;
@@ -27,42 +34,9 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 		grabCoords: { gridX: number; gridY: number };
 	} | null>(null);
 
-	useEffect(() => {
-		if (turn === ChessColor.Black) {
-			if (getValidTeamMoves(ChessColor.Black, boardData).length === 0) {
-				console.log("white wins");
-				return;
-			}
-		} else if (turn === ChessColor.White) {
-			if (getValidTeamMoves(ChessColor.White, boardData).length === 0) {
-				console.log("black wins");
-				return;
-			}
-		}
-		if (turn !== player.color) {
-			if (opponent.isComputer) {
-				const computerMove = getBestMove(opponent.color, boardData);
-				if (computerMove) attemptTurn(computerMove);
-				else computerMove && attemptTurn(computerMove);
-			}
-		} else {
-			const computerMove = getBestMove(player.color, boardData);
-			if (computerMove) attemptTurn(computerMove);
-			else computerMove && attemptTurn(computerMove);
-		}
-	}, [turn]);
-
 	//attempt to take turn
 	function attemptTurn(suggestedMove: ChessMove) {
-		//make sure its the players turn
-		if (turn !== suggestedMove.pieceToMove.pieceColor) return;
-		if (isValidMove(suggestedMove)) {
-			//move is valid so update the board
-			setBoardData(boardAfterMove(suggestedMove));
-			//update whose turn it is
-			setTurn((prevTurn) => (prevTurn === ChessColor.White ? ChessColor.Black : ChessColor.White));
-			console.log("turn updated");
-		}
+		socket.emit("attempt_move", userProfile, room, suggestedMove);
 	}
 
 	function grabPiece(e: React.MouseEvent) {
@@ -78,8 +52,8 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 			const x = e.clientX - PIECE_SIZE / 2;
 			const y = e.clientY - PIECE_SIZE / 2;
 
-			const currentPiece = boardData.pieces.find((p) => {
-				return p.coords.x === gridX && p.coords.y === gridY && p.pieceColor === player.color;
+			const currentPiece = board.pieces.find((p) => {
+				return p.coords.x === gridX && p.coords.y === gridY && p.pieceColor === playerColor;
 			});
 			if (currentPiece) {
 				//render the element at the mouse cursor
@@ -143,7 +117,7 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 
 			//move being attempted by player
 			const moveAttempt: ChessMove = {
-				board: boardData,
+				board: board,
 				pieceToMove: activePiece.piece,
 				targetCoords: gridCoords,
 			};
@@ -155,7 +129,8 @@ export const ChessBoard: React.FC<Props> = ({ player, opponent }: Props) => {
 	}
 
 	//squares to render to the screen
-	const squareElements = boardData.squares.map((square: Square) => {
+	const squares = board.squares; //playerColor === ChessColor.Black ? board.squares.reverse() : board.squares;
+	const squareElements = squares.map((square: Square) => {
 		const keyId = square.coords.x + square.coords.y * GRID_SIZE;
 		if (square.piece) {
 			return <ChessSquare key={keyId} squareColor={square.color} piece={square.piece} />;

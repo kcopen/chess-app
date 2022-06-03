@@ -25,5 +25,8 @@
     "mongoose": "^6.3.4",
     "nano": "^10.0.0",
     "socket.io": "^4.5.1"
-  }
+  },
+    "bin":{
+      "sharedLibs": "./../client/src/shared-libs"
+    }
 }
