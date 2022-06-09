@@ -30,18 +30,21 @@ export interface Square {
 	piece: Piece | undefined;
 }
 
-export interface Chessboard {
-	squares: Square[];
-	pieces: Piece[];
-	turn: ChessColor;
-}
-
 export interface ChessMove {
 	board: Chessboard;
 	pieceToMove: Piece;
 	targetCoords: Coords;
 	score?: number;
 }
+
+export interface Chessboard {
+	squares: Square[];
+	pieces: Piece[];
+	turn: ChessColor;
+	prevMove: ChessMove | undefined;
+}
+
+
 
 export interface ChessPlayer {
 	username: string;

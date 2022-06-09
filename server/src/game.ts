@@ -59,6 +59,7 @@ export class ChessGame{
     public startGame(): boolean{
         if(this.gameIsReadyToStart()){
             this.gameStatus = GameStatus.GameRunning;
+            console.log(`Game started:: Room:${this.room} white:${this.whitePlayer?.username} black:${this.blackPlayer?.username}`)
             return true;
         }
         return false;
@@ -66,7 +67,7 @@ export class ChessGame{
 
     public attemptMove(player: UserProfile, move: ChessMove): Chessboard | undefined{
         if(this.gameStatus !== GameStatus.GameRunning) return undefined;
-        if(player.username === (this.whitePlayer?.username || this.blackPlayer?.username)){
+        if(player.username === this.whitePlayer?.username || player.username === this.blackPlayer?.username){
             if(isValidMove(move)){
                 this.board = boardAfterMove(move);
                 return this.board;

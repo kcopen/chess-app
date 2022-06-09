@@ -15,6 +15,7 @@ export interface ClientToServerEvents {
 	attempt_move: (userProfile: UserProfile, room: string, move: ChessMove) => void;
 	join_queue:(userProfile: UserProfile)=>void;
 	get_current_game_info: (userProfile:UserProfile)=>void;
+	reconnect: (userProfile: UserProfile)=>void;
     
 }
 

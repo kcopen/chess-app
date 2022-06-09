@@ -19,11 +19,11 @@ export const LoginApp: React.FC<Props> = ({}) => {
 
 	useEffect(() => {
 		socket.on("login_response", (loginResponse: UserProfile) => {
+			console.log("response");
 			setUserProfile(loginResponse);
 		});
 		socket.on("register_response", (registerResponse: UserProfile) => {
 			setUserProfile(registerResponse);
-			console.log("thank you for registering");
 		});
 	}, [socket]);
 

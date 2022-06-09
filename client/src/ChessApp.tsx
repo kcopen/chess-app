@@ -18,6 +18,18 @@ function ChessApp() {
 	const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>>(io("http://localhost:30690").connect());
 
 	useEffect(() => {
+		socket.on("disconnect", (reason) => {
+			console.log("disconnection");
+			if (reason === "io client disconnect" || reason === "io server disconnect") {
+				//manual disconnection
+			} else {
+				//unwanted disconnection
+				if (userProfile) {
+					socket.emit("login_request", userProfile);
+					socket.emit("get_current_game_info", userProfile);
+				}
+			}
+		});
 		socket.on("current_game_info", (room, playerColor) => {
 			setRoom(room);
 			setPlayerColor(playerColor);
@@ -35,7 +47,8 @@ function ChessApp() {
 			{userProfile ? (
 				room !== "" ? (
 					<div className="chess-app">
-						<ChessTimer timeLimit={5 * 60} />
+						<span>Team:{playerColor}</span>
+						<span>Room:{room}</span>
 						<ChessBoard userProfile={userProfile} room={room} playerColor={playerColor} />
 					</div>
 				) : (

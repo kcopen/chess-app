@@ -209,5 +209,5 @@ export const initSquares = (pieces: Piece[]): Square[] => {
 export const initBoard = (): Chessboard =>{
 	const pieces = initPieces();
 	const squares = initSquares(pieces);
-	return {squares, pieces, turn: ChessColor.White};
+	return {squares, pieces, turn: ChessColor.White, prevMove: undefined};
 }

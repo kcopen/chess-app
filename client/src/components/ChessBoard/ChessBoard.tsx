@@ -7,7 +7,7 @@ import { SocketContext } from "../../ChessApp";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
 import { Socket } from "socket.io-client";
 import { UserProfile } from "../../shared-libs/UserProfile";
-import { inGridBounds } from "../../shared-libs/chessEngine/chessRules";
+import { getValidTeamMoves, inGridBounds, isSameCoords } from "../../shared-libs/chessEngine/chessRules";
 import { initBoard } from "../../shared-libs/chessEngine/boardInit";
 
 interface Props {
@@ -20,11 +20,12 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const chessBoardRef = useRef<HTMLDivElement>(null);
 	const [board, setBoard] = useState<Chessboard>(initBoard());
+	const [validMoves, setValidMoves] = useState<ChessMove[]>([]);
 
 	useEffect(() => {
 		socket.on("board_update", (updatedBoard: Chessboard) => {
-			console.log(updatedBoard);
 			setBoard(updatedBoard);
+			if (playerColor) setValidMoves(getValidTeamMoves(playerColor, updatedBoard));
 		});
 	}, [socket]);
 
@@ -132,10 +133,14 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 	const squares = board.squares; //playerColor === ChessColor.Black ? board.squares.reverse() : board.squares;
 	const squareElements = squares.map((square: Square) => {
 		const keyId = square.coords.x + square.coords.y * GRID_SIZE;
+		let highlight = false;
+		if (validMoves.find((m) => isSameCoords(m.targetCoords, square.coords))) {
+			highlight = true;
+		}
 		if (square.piece) {
-			return <ChessSquare key={keyId} squareColor={square.color} piece={square.piece} />;
+			return <ChessSquare key={keyId} squareColor={square.color} piece={square.piece} isHighlighted={highlight} />;
 		} else {
-			return <ChessSquare key={keyId} squareColor={square.color} />;
+			return <ChessSquare key={keyId} squareColor={square.color} isHighlighted={highlight} />;
 		}
 	});
 

@@ -20,6 +20,8 @@ app.use(cors());
 const server = http.createServer(app);
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, any>(server, {
+    pingInterval: 1000 * 60 * 5,
+    pingTimeout: 1000 * 60 * 3,
     cors: {
         origin: "http://localhost:3000",
         methods: ["GET", "POST"],
@@ -28,9 +30,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 
 const gameManager = new GameManager();
 
-io.on("connection", (socket)=>{
-    console.log(`Userid:${socket.id} connected to server.`);
-    
+io.on("connection", (socket)=>{    
     socket.on("login_request", (userProfile)=>{
         if(userProfile){
             UserModel.findOne({username: userProfile.username, password: userProfile.password},(err: any,result: UserProfile)=>{
@@ -38,13 +38,16 @@ io.on("connection", (socket)=>{
                     //handle errors
                 } else {
                     if(result && result.username === userProfile.username && result.password === userProfile.password){
+                        socket.data.userProfile = userProfile;
                         socket.join(userProfile.username);
                         io.to(userProfile.username).emit("login_response", result);
+                        console.log(`Username:${userProfile.username} has logged in.`)
                     }
                 }
             })
         }
     });
+
     socket.on("register_request", async (userProfile)=>{
         const newUser = new UserModel({
             ...userProfile,
@@ -57,14 +60,18 @@ io.on("connection", (socket)=>{
         });
 
         await newUser.save();
+        socket.data.userProfile = userProfile;
         socket.join(userProfile.username);
         io.to(userProfile.username).emit("register_response", userProfile);
+        console.log(`Username:${userProfile.username} has logged in.`)
     });
+    
     socket.on("join_queue", (user)=>{
         const game = gameManager.joinQueue(user);
         const room = game.getRoom();
         const playerColor = game.getPlayerColor(user);
         const board = game.getBoard();
+        socket.join(room);
         io.to(user.username).emit("current_game_info", room, playerColor);
         io.to(room).emit("board_update", board);
     });
@@ -94,11 +101,11 @@ io.on("connection", (socket)=>{
     socket.on("attempt_move", (userProfile, room, move)=>{
         const updatedBoard = gameManager.attemptMove(room, userProfile, move);
         if(updatedBoard){
-            socket.to(room).emit("board_update", updatedBoard);
+            io.to(room).emit("board_update", updatedBoard);
         }
     })
 
-    socket.on("disconnect", ()=>{
+    socket.on("disconnect", (reason)=>{
         console.log(`Userid:${socket.id} disconnected from server.`);
     })
 
