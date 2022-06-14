@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import http from "http";
 import cors from "cors";
 import {Server} from "socket.io";
@@ -11,11 +12,36 @@ import { GameManager } from "./gameManager";
 mongoose.connect("mongodb+srv://kncopen:JJsgprAN8MtytNV@chessapp.dktid98.mongodb.net/ChessDB?retryWrites=true&w=majority");
 
 const app = express();
+app.use(bodyParser.json());
 app.use(cors());
 
+app.post('/auth', async (req, res)=>{
+    const username: string = req.body.username;
+    const password: string = req.body.password;
+    if(!username || !password) {
+        return res.status(400).json({'message':'Username and password are required.'});
+    }
+    const user = await UserModel.findOne({username, password}).exec();
+    if(!user) return res.sendStatus(401);
+    
+    res.json(user);
+});
 
+app.post("/register", async (req, res)=>{
+    const userProfile: UserProfile = req.body;
+    const newUser = new UserModel({
+        ...userProfile,
+        chessStats: {
+            wins: 0,
+            losses: 0,
+            draws: 0,
+        }
 
+    });
 
+    await newUser.save();
+    res.json(newUser);
+});
 
 const server = http.createServer(app);
 
@@ -30,40 +56,13 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 
 const gameManager = new GameManager();
 
-io.on("connection", (socket)=>{    
+io.on("connection", (socket)=>{
     socket.on("login_request", (userProfile)=>{
         if(userProfile){
-            UserModel.findOne({username: userProfile.username, password: userProfile.password},(err: any,result: UserProfile)=>{
-                if(err){
-                    //handle errors
-                } else {
-                    if(result && result.username === userProfile.username && result.password === userProfile.password){
-                        socket.data.userProfile = userProfile;
-                        socket.join(userProfile.username);
-                        io.to(userProfile.username).emit("login_response", result);
-                        console.log(`Username:${userProfile.username} has logged in.`)
-                    }
-                }
-            })
+            socket.data.userProfile = userProfile;
+            socket.join(userProfile.username);
+            console.log(`Username:${userProfile.username} has logged in.`)
         }
-    });
-
-    socket.on("register_request", async (userProfile)=>{
-        const newUser = new UserModel({
-            ...userProfile,
-            chessStats: {
-                wins: 0,
-	            losses: 0,
-	            draws: 0,
-            }
-
-        });
-
-        await newUser.save();
-        socket.data.userProfile = userProfile;
-        socket.join(userProfile.username);
-        io.to(userProfile.username).emit("register_response", userProfile);
-        console.log(`Username:${userProfile.username} has logged in.`)
     });
     
     socket.on("join_queue", (user)=>{
@@ -112,7 +111,7 @@ io.on("connection", (socket)=>{
 
 })
 
-server.listen(30690, ()=>{
-    console.log("SERVER STARTED: Listening on port: 30690");
+server.listen(3500, ()=>{
+    console.log("SERVER STARTED: Listening on port: 3500");
 })
 

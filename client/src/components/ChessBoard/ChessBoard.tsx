@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChessSquare } from "../ChessSquare/ChessSquare";
 import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../shared-libs/config";
-import { Chessboard, ChessColor, ChessMove, ChessPlayer, Coords, Piece, Square } from "../../shared-libs/chessEngine/ChessTypes";
+import { Chessboard, ChessColor, ChessMove, Coords, Piece, Square } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessBoard.css";
-import { SocketContext } from "../../ChessApp";
+import { SocketContext } from "../../pages/ChessApp/ChessApp";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
 import { Socket } from "socket.io-client";
 import { UserProfile } from "../../shared-libs/UserProfile";
