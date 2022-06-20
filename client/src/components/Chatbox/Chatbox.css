@@ -1,0 +1,22 @@
+.chatbox{
+    border-style: solid;
+    border-width: 3px;
+    border-color: red;
+    border-collapse: collapse;
+}
+
+.chatbox_header{
+
+}
+
+.chatbox_footer{
+
+}
+
+.chatbox_message{
+
+}
+
+.chatbox_username{
+
+}

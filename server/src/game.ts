@@ -101,5 +101,12 @@ export class ChessGame{
         return undefined;
     }
 
+    public isPlayerInGame(playerToFind: UserProfile): boolean{
+        if(this.whitePlayer?.username === playerToFind.username)return true;
+        else if(this.blackPlayer?.username === playerToFind.username)return true;
+        else if(this.spectators.find((user)=>{user.username === playerToFind.username}))return true;
+        return false;
+    }
+
 }
 

@@ -29,6 +29,10 @@ app.post('/auth', async (req, res)=>{
 
 app.post("/register", async (req, res)=>{
     const userProfile: UserProfile = req.body;
+    const user = await UserModel.findOne({username: userProfile.username}).exec()
+    if(user){
+        return res.status(400).json({'message':'User already exists.'});
+    }
     const newUser = new UserModel({
         ...userProfile,
         chessStats: {
@@ -38,6 +42,7 @@ app.post("/register", async (req, res)=>{
         }
 
     });
+    
 
     await newUser.save();
     res.json(newUser);
@@ -102,7 +107,14 @@ io.on("connection", (socket)=>{
         if(updatedBoard){
             io.to(room).emit("board_update", updatedBoard);
         }
-    })
+    });
+
+    socket.on("send_chat_message", (userProfile, room, message)=>{
+        const game = gameManager.getGame(room);
+        if(game?.isPlayerInGame(userProfile)){
+            io.to(room).emit("chatbox_update", userProfile.username, message);
+        }
+    });
 
     socket.on("disconnect", (reason)=>{
         console.log(`Userid:${socket.id} disconnected from server.`);

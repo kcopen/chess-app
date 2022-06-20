@@ -10,16 +10,14 @@ import Register from "./pages/Register";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
-	<React.StrictMode>
-		<AuthProvider>
-			<BrowserRouter>
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/register" element={<Register />} />
-					<Route path="/chess" element={<ChessApp />} />
-				</Routes>
-			</BrowserRouter>
-		</AuthProvider>
-	</React.StrictMode>
+	<AuthProvider>
+		<BrowserRouter>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/register" element={<Register />} />
+				<Route path="/chess" element={<ChessApp />} />
+			</Routes>
+		</BrowserRouter>
+	</AuthProvider>
 );

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { UserProfile } from "../shared-libs/UserProfile";
 
@@ -11,9 +11,9 @@ const Login: React.FC = () => {
 	const userRef = useRef<HTMLInputElement>(null);
 	const errRef = useRef<HTMLParagraphElement>(null);
 
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [errMsg, setErrMsg] = useState("");
+	const [username, setUsername] = useState<string>("");
+	const [password, setPassword] = useState<string>("");
+	const [errMsg, setErrMsg] = useState<string>("");
 
 	useEffect(() => {
 		userRef.current?.focus();
@@ -37,13 +37,13 @@ const Login: React.FC = () => {
 			}
 		} catch (err: any) {
 			if (!err?.response) {
-				setErrMsg("No server response");
+				setErrMsg("No server response.");
 			} else if (err.response?.status === 400) {
 				setErrMsg("Missing username or password.");
 			} else if (err.response?.status === 401) {
-				setErrMsg("Unauthorized");
+				setErrMsg("Unauthorized.");
 			} else {
-				setErrMsg("Login Failed");
+				setErrMsg("Login Failed.");
 			}
 			errRef.current?.focus();
 		}
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
 			<p>
 				Need an Account? <br />
 				<span className="line">
-					<a href="">Sign Up</a>
+					<Link to="/register">Sign Up</Link>
 				</span>
 			</p>
 		</section>
