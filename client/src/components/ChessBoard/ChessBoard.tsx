@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChessSquare } from "../ChessSquare/ChessSquare";
-import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../shared-libs/config";
+import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../config";
 import { Chessboard, ChessColor, ChessMove, Coords, Piece, Square } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessBoard.css";
 import { SocketContext } from "../../pages/ChessApp/ChessApp";
@@ -47,11 +47,11 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 		if (element.classList.contains("chess-piece") && chessBoard) {
 			//mouse position in grid units
 			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / SQUARE_SIZE);
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / SQUARE_SIZE));
+			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / SQUARE_SIZE));
 
 			//position of element to render (mouse location in pixels)
-			const x = e.clientX - PIECE_SIZE / 2;
-			const y = e.clientY - PIECE_SIZE / 2;
+			const x = e.clientX - PIECE_SIZE() / 2;
+			const y = e.clientY - PIECE_SIZE() / 2;
 
 			const currentPiece = board.pieces.find((p) => {
 				return p.coords.x === gridX && p.coords.y === gridY && p.pieceColor === playerColor;
@@ -70,13 +70,13 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 		const chessBoard = chessBoardRef.current;
 		if (activePiece && chessBoard) {
 			//boundaries of the chessboard that the piece element can be within in pixels
-			const minX = chessBoard.offsetLeft - PIECE_SIZE / 2;
-			const minY = chessBoard.offsetTop - PIECE_SIZE / 2;
-			const maxX = minX + BOARD_SIZE;
-			const maxY = minY + BOARD_SIZE;
+			const minX = chessBoard.offsetLeft - PIECE_SIZE() / 2;
+			const minY = chessBoard.offsetTop - PIECE_SIZE() / 2;
+			const maxX = minX + BOARD_SIZE();
+			const maxY = minY + BOARD_SIZE();
 
-			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE);
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / PIECE_SIZE));
+			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE());
+			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / PIECE_SIZE()));
 			const gridCoords: Coords = { x: gridX, y: gridY };
 			if (!inGridBounds(gridCoords)) {
 				activePiece.element.style.position = "relative";
@@ -86,8 +86,8 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 				return;
 			}
 			//position of element to render (mouse location in pixels)
-			const x = e.clientX - PIECE_SIZE / 2;
-			const y = e.clientY - PIECE_SIZE / 2;
+			const x = e.clientX - PIECE_SIZE() / 2;
+			const y = e.clientY - PIECE_SIZE() / 2;
 
 			//render element at mouse location
 			//if out of bounds render at edge of board
@@ -107,8 +107,8 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 		const chessBoard = chessBoardRef.current;
 		if (activePiece && chessBoard) {
 			//current grid coordinates of mouse
-			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE);
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE) / PIECE_SIZE));
+			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE());
+			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / PIECE_SIZE()));
 			const gridCoords: Coords = { x: gridX, y: gridY };
 
 			//reset the styles and set active piece to null aka "drop" the element
@@ -151,10 +151,6 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 			onMouseMove={(e) => movePiece(e)}
 			onMouseUp={(e) => dropPiece(e)}
 			ref={chessBoardRef}
-			style={{
-				width: BOARD_SIZE,
-				height: BOARD_SIZE,
-			}}
 		>
 			{[...squareElements]}
 		</div>

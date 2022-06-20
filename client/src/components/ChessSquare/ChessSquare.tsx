@@ -2,7 +2,7 @@ import React from "react";
 import { ChessPiece } from "../ChessPiece/ChessPiece";
 import { ChessColor, PieceType } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessSquare.css";
-import { BLACK_SQUARE_COLOR, HIGHLIGHTED_BORDER_SIZE, WHITE_SQUARE_COLOR } from "../../shared-libs/config";
+import { BLACK_SQUARE_COLOR, HIGHLIGHTED_BORDER_SIZE, WHITE_SQUARE_COLOR } from "../../config";
 
 interface Props {
 	squareColor: string;

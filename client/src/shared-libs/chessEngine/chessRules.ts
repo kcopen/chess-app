@@ -1,5 +1,6 @@
 import { ChessMove, PieceType, Square, Chessboard, Piece, Coords, ChessColor } from "./ChessTypes";
-import { GRID_SIZE } from "../config";
+
+const GRID_SIZE=8;
 
 //todo make sure king isnt in check before returning
 export const isValidMove = (move: ChessMove, validateCheck: boolean = true): boolean => {
@@ -155,7 +156,6 @@ function isCastle({ board, pieceToMove, targetCoords }: ChessMove): boolean{
 		for(let x = pieceToMove.coords.x - 1; x > targetCoords.x; x--){
 			const coordsToCheck: Coords = {x: x, y: pieceToMove.coords.y};
 			if(pieceAt(coordsToCheck, board) || isCoordsUnderAttack(enemyColor, coordsToCheck, board)){
-				console.log(coordsToCheck)
 				return false;
 			}
 		}
