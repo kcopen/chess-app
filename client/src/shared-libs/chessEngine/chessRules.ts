@@ -424,3 +424,25 @@ export const inGridBounds = (coords: Coords): boolean => {
 	if (coords.x >= 1 && coords.x <= GRID_SIZE && coords.y >= 1 && coords.y <= GRID_SIZE) return true;
 	return false;
 };
+export const squareName = (coords:Coords): string =>{
+	switch(coords.x){
+		case 1:
+			return `a${coords.y}`;
+		case 2:
+			return `b${coords.y}`;
+		case 3:
+			return `c${coords.y}`;
+		case 4:
+			return `d${coords.y}`;
+		case 5:
+			return `e${coords.y}`;
+		case 6:
+			return `f${coords.y}`;
+		case 7:
+			return `g${coords.y}`;
+		case 8:
+			return `h${coords.y}`;
+		default:
+			return ""
+	}
+}

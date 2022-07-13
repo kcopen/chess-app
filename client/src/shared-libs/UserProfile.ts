@@ -5,5 +5,6 @@ export interface UserProfile {
 	lastname: string;
 	username: string;
 	password: string;
+	friends?: string[]; 
 	chessStats?: ChessStats;
 }

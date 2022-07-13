@@ -10,6 +10,16 @@
   background-color:rgb(151, 148, 144)
 }
 
+.draw-button {
+  background-color:lightgray;
+}
+
+.draw-button-highlighted {
+  background-color:red;
+  color:white;
+}
+
+
 @media(min-width: 768px){
 
 }
@@ -25,6 +35,9 @@
     align-content:center;
     justify-content: center;
     align-items:flex-start;
+  }
+  .side-container {
+    height: 800px;
   }
 }
 

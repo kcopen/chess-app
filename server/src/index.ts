@@ -73,39 +73,65 @@ io.on("connection", (socket)=>{
     socket.on("join_queue", (user)=>{
         const game = gameManager.joinQueue(user);
         const room = game.getRoom();
-        const playerColor = game.getPlayerColor(user);
-        const board = game.getBoard();
+        const match = game.getMatch();
         socket.join(room);
-        io.to(user.username).emit("current_game_info", room, playerColor);
-        io.to(room).emit("board_update", board);
+        io.to(user.username).emit("current_room_info", room);
+        io.to(room).emit("match_update", match);
     });
 
     socket.on("get_current_game_info",(user: UserProfile)=>{
         const game = gameManager.getUserCurrentGame(user);
         const room = game?.getRoom();
-        const playerColor = game?.getPlayerColor(user);
-        if(room && playerColor){
-            io.to(user.username).emit("current_game_info", room, playerColor);
+        const match = game?.getMatch();
+        if(room && match){
+            io.to(user.username).emit("current_room_info", room);
+            io.to(user.username).emit("match_update", match);
         }
         
     });
 
-    socket.on("join_chess_room_request", (userProfile, room)=>{
-        gameManager.joinGame(room, userProfile);
+    socket.on("join_chess_room_request", (user, room)=>{
+        gameManager.joinGame(room, user);
         const game = gameManager.getGame(room);
-        const playerColor = game?.getPlayerColor(userProfile);
         if(game){
-            if(playerColor){
-                io.to(room).emit("current_game_info", room, playerColor);
+            io.to(user.username).emit("current_room_info", room);
+            const match = game.getMatch();
+            if(match){
+                io.to(room).emit("match_update", match);
             }
-            io.to(room).emit("board_update", game.getBoard());
+            
         }
     });
 
     socket.on("attempt_move", (userProfile, room, move)=>{
         const updatedBoard = gameManager.attemptMove(room, userProfile, move);
         if(updatedBoard){
-            io.to(room).emit("board_update", updatedBoard);
+            const updatedMatch = gameManager.getGame(room)?.getMatch();
+            if(updatedMatch){
+                io.to(room).emit("match_update", updatedMatch);
+            }
+        }
+    });
+
+    socket.on("resign", (room, userProfile)=>{
+        const game = gameManager.getGame(room);
+        if(game){
+            if(game.attemptResign(userProfile)){
+                const match = game.getMatch();
+                io.to(room).emit("match_update", match);
+            }
+        }
+    });
+
+    socket.on("request_draw", (room, userProfile)=>{
+        const game = gameManager.getGame(room);
+        if(game){
+            if(game.attemptDraw(userProfile)){
+                const match = game.getMatch();
+                io.to(room).emit("match_update", match);
+            }else {
+                socket.to(room).emit("draw_requested", true)
+            }
         }
     });
 

@@ -1,12 +1,13 @@
-import { Chessboard, ChessColor, ChessMove } from "./chessEngine/ChessTypes";
+import { ChessMatch, ChessMove } from "./chessEngine/ChessTypes";
 import { UserProfile } from "./UserProfile";
 
 export interface ServerToClientEvents {
 	login_response: (userProfile:UserProfile)=>void;
 	register_response: (userProfile:UserProfile)=>void;
-	current_game_info: (room: string, playerColor: ChessColor | undefined) => void;
-	board_update: (board: Chessboard)=> void;
+	current_room_info: (room: string) => void;
+	match_update: (match: ChessMatch)=> void;
 	chatbox_update: (user:string, message: string)=>void;
+	draw_requested: (drawRequested: boolean) =>void;
 }
 
 export interface ClientToServerEvents {
@@ -18,6 +19,9 @@ export interface ClientToServerEvents {
 	get_current_game_info: (userProfile:UserProfile)=>void;
 	reconnect: (userProfile: UserProfile)=>void;
 	send_chat_message: (userProfile: UserProfile, room:string, message:string)=>void;
+	add_friend: (userProfile: UserProfile, friendToAdd: string)=> void;
+	resign:(room: string, userProfile: UserProfile)=>void;
+	request_draw:(room: string, userProfile: UserProfile)=>void;
     
 }
 

@@ -1,8 +1,10 @@
+import { squareName } from "./chessRules";
 import { Chessboard, ChessColor, Piece, PieceType, Square } from "./ChessTypes";
 
 export const initPieces = (): Piece[] => {
 	const pieces: Piece[] = [];
 	pieces.push({
+		name:"wr1",
 		pieceType: PieceType.Rook,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -12,6 +14,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wn1",
 		pieceType: PieceType.Knight,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -21,6 +24,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wb1",
 		pieceType: PieceType.Bishop,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -30,6 +34,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wk",
 		pieceType: PieceType.King,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -39,6 +44,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wq",
 		pieceType: PieceType.Queen,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -48,6 +54,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wb2",
 		pieceType: PieceType.Bishop,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -57,6 +64,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wn2",
 		pieceType: PieceType.Knight,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -66,6 +74,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"wr2",
 		pieceType: PieceType.Rook,
 		pieceColor: ChessColor.White,
 		coords: {
@@ -76,6 +85,7 @@ export const initPieces = (): Piece[] => {
 	});
 	for (let i = 1; i <= 8; i++) {
 		pieces.push({
+			name:`wp${i}`,
 			pieceType: PieceType.Pawn,
 			pieceColor: ChessColor.White,
 			coords: {
@@ -87,6 +97,7 @@ export const initPieces = (): Piece[] => {
 	}
 
 	pieces.push({
+		name:"br1",
 		pieceType: PieceType.Rook,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -96,6 +107,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"bn1",
 		pieceType: PieceType.Knight,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -105,6 +117,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"bb1",
 		pieceType: PieceType.Bishop,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -114,6 +127,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"bk",
 		pieceType: PieceType.King,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -123,6 +137,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"bq",
 		pieceType: PieceType.Queen,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -132,6 +147,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"bb2",
 		pieceType: PieceType.Bishop,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -141,6 +157,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"bn2",
 		pieceType: PieceType.Knight,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -150,6 +167,7 @@ export const initPieces = (): Piece[] => {
 		moveCount: 0,
 	});
 	pieces.push({
+		name:"br2",
 		pieceType: PieceType.Rook,
 		pieceColor: ChessColor.Black,
 		coords: {
@@ -160,6 +178,7 @@ export const initPieces = (): Piece[] => {
 	});
 	for (let i = 1; i <= 8; i++) {
 		pieces.push({
+			name:`bp${i}`,
 			pieceType: PieceType.Pawn,
 			pieceColor: ChessColor.Black,
 			coords: {
@@ -172,12 +191,17 @@ export const initPieces = (): Piece[] => {
 	return pieces;
 };
 
+
 export const initSquares = (pieces: Piece[]): Square[] => {
 	const squares: Square[] = [];
 	function addSquare(rank: number, file: number) {
 		const piece: Piece | undefined = pieces.find((piece) => piece.coords.x === file && piece.coords.y === rank);
 		if (piece) {
 			squares.push({
+				name: squareName({
+					x: file,
+					y: rank,
+				}),
 				color: (file + rank) % 2 === 0 ? ChessColor.White : ChessColor.Black,
 				coords: {
 					x: file,
@@ -187,6 +211,10 @@ export const initSquares = (pieces: Piece[]): Square[] => {
 			});
 		} else {
 			squares.push({
+				name: squareName({
+					x: file,
+					y: rank,
+				}),
 				color: (file + rank) % 2 === 0 ? ChessColor.White : ChessColor.Black,
 				coords: {
 					x: file,

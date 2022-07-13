@@ -3,31 +3,25 @@ import { ChessSquare } from "../ChessSquare/ChessSquare";
 import { BOARD_SIZE, GRID_SIZE, PIECE_SIZE, SQUARE_SIZE } from "../../config";
 import { Chessboard, ChessColor, ChessMove, Coords, Piece, Square } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessBoard.css";
-import { SocketContext } from "../../pages/ChessApp/ChessApp";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
 import { Socket } from "socket.io-client";
 import { UserProfile } from "../../shared-libs/UserProfile";
 import { getValidTeamMoves, inGridBounds, isSameCoords } from "../../shared-libs/chessEngine/chessRules";
 import { initBoard } from "../../shared-libs/chessEngine/boardInit";
+import { SocketContext } from "../../App";
 
 interface Props {
 	userProfile: UserProfile;
 	room: string;
 	playerColor: ChessColor | undefined;
+	board: Chessboard;
 }
 
-export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: Props) => {
+export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor, board }: Props) => {
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const chessBoardRef = useRef<HTMLDivElement>(null);
-	const [board, setBoard] = useState<Chessboard>(initBoard());
-	const [validMoves, setValidMoves] = useState<ChessMove[]>([]);
 
-	useEffect(() => {
-		socket.on("board_update", (updatedBoard: Chessboard) => {
-			setBoard(updatedBoard);
-			if (playerColor) setValidMoves(getValidTeamMoves(playerColor, updatedBoard));
-		});
-	}, [socket]);
+	const validMoves: ChessMove[] = playerColor ? getValidTeamMoves(playerColor, board) : [];
 
 	const [activePiece, setActivePiece] = useState<{
 		piece: Piece;
@@ -132,16 +126,11 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor }: 
 	//squares to render to the screen
 	const squares = board.squares; //playerColor === ChessColor.Black ? board.squares.reverse() : board.squares;
 	const squareElements = squares.map((square: Square) => {
-		const keyId = square.coords.x + square.coords.y * GRID_SIZE;
 		let highlight = false;
 		if (validMoves.find((m) => isSameCoords(m.targetCoords, square.coords))) {
 			highlight = true;
 		}
-		if (square.piece) {
-			return <ChessSquare key={keyId} squareColor={square.color} piece={square.piece} isHighlighted={highlight} />;
-		} else {
-			return <ChessSquare key={keyId} squareColor={square.color} isHighlighted={highlight} />;
-		}
+		return <ChessSquare key={square.name} square={square} isHighlighted={highlight} />;
 	});
 
 	return (

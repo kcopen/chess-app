@@ -18,6 +18,7 @@ export interface Coords {
 }
 
 export interface Piece {
+	name: string;
 	pieceType: PieceType;
 	pieceColor: ChessColor;
 	coords: Coords;
@@ -25,6 +26,7 @@ export interface Piece {
 }
 
 export interface Square {
+	name: string;
 	color: ChessColor;
 	coords: Coords;
 	piece: Piece | undefined;
@@ -44,10 +46,24 @@ export interface Chessboard {
 	prevMove: ChessMove | undefined;
 }
 
-
-
 export interface ChessPlayer {
 	username: string;
-	color: ChessColor;
-	isComputer?: true;
+	isComputer: boolean;
 }
+
+export enum ChessMatchResult {
+	Unfinished = "unfinished",
+	Draw = "draw",
+	WhiteWins = "white_wins",
+	BlackWins = "black_wins",
+	Stalemate = "stalemate"
+}
+
+export interface ChessMatch {
+	whitePlayer: ChessPlayer;
+	blackPlayer: ChessPlayer;
+	board: Chessboard;
+	result: ChessMatchResult;
+}
+
+

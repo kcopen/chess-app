@@ -20,6 +20,15 @@ const UsersSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    friends: {
+        type: [{
+            username: {
+                type: String,
+                required: true
+            }
+        }],
+        required: false,
+    },
     chessStats: {
         type: {
             wins: {

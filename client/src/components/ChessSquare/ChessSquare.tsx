@@ -1,27 +1,23 @@
 import React from "react";
 import { ChessPiece } from "../ChessPiece/ChessPiece";
-import { ChessColor, PieceType } from "../../shared-libs/chessEngine/ChessTypes";
+import { ChessColor, PieceType, Square } from "../../shared-libs/chessEngine/ChessTypes";
 import "./ChessSquare.css";
 import { BLACK_SQUARE_COLOR, HIGHLIGHTED_BORDER_SIZE, WHITE_SQUARE_COLOR } from "../../config";
 
 interface Props {
-	squareColor: string;
-	piece?: {
-		pieceType: PieceType;
-		pieceColor: string;
-	};
 	isHighlighted: boolean;
+	square: Square;
 }
 
-export const ChessSquare: React.FC<Props> = ({ squareColor, piece, isHighlighted }: Props) => {
+export const ChessSquare: React.FC<Props> = ({ isHighlighted, square }: Props) => {
 	const squareStyles = {
-		backgroundColor: squareColor === ChessColor.White ? WHITE_SQUARE_COLOR : BLACK_SQUARE_COLOR,
+		backgroundColor: square.color === ChessColor.White ? WHITE_SQUARE_COLOR : BLACK_SQUARE_COLOR,
 		border: isHighlighted ? `${HIGHLIGHTED_BORDER_SIZE}px solid red` : `none`,
 	};
 
 	const pieceElement = () => {
-		if (piece) {
-			return <ChessPiece pieceType={piece.pieceType} pieceColor={piece.pieceColor} />;
+		if (square.piece) {
+			return <ChessPiece pieceType={square.piece.pieceType} pieceColor={square.piece.pieceColor} />;
 		}
 	};
 	return (

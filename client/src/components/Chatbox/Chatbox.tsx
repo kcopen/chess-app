@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { SocketContext } from "../../pages/ChessApp/ChessApp";
 import { ServerToClientEvents, ClientToServerEvents } from "../../shared-libs/socketTypes";
 import { useAuth } from "../../context/AuthProvider";
 import "./Chatbox.css";
+import { SocketContext } from "../../App";
 
 interface ChatMessage {
 	username: string;
@@ -36,9 +36,9 @@ const Chatbox: React.FC<Props> = ({ room }: Props) => {
 	return (
 		<div className="chatbox">
 			<div className="chatbox_header">
-				{chatHistory.map((chatMessage: ChatMessage) => {
+				{chatHistory.map((chatMessage: ChatMessage, index: number) => {
 					return (
-						<p id={chatMessage.username === userProfile.username ? "you" : "other"}>
+						<p key={index} className={chatMessage.username === userProfile.username ? "you" : "other"}>
 							<span className="chatbox_username">{chatMessage.username}: </span>
 							<span className="chatbox_message">{chatMessage.message}</span>
 						</p>

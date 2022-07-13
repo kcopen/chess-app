@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import axios from "../API/axios";
-import { UserProfile } from "../shared-libs/UserProfile";
+import axios from "../../API/axios";
+import { UserProfile } from "../../shared-libs/UserProfile";
+import "./Register.css";
 
 const REGISTER_URL = "/register";
 

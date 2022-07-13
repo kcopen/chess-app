@@ -6,9 +6,12 @@ interface Props {
 
 export const ChessTimer: React.FC<Props> = ({ timeLimit }: Props) => {
 	const [currentTime, setCurrentTime] = useState<number>(timeLimit);
+	const [timerRunning, setTimerRunning] = useState<Boolean>(false);
 	useEffect(() => {
 		setTimeout(() => {
-			setCurrentTime(currentTime - 1);
+			if (currentTime > 0) {
+				setCurrentTime(currentTime - 1);
+			}
 		}, 1000);
 	}, [currentTime]);
 

@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider";
-import { UserProfile } from "../shared-libs/UserProfile";
+import { useAuth } from "../../context/AuthProvider";
+import { UserProfile } from "../../shared-libs/UserProfile";
+import "./Login.css";
 
-import axios from "../API/axios";
+import axios from "../../API/axios";
 const LOGIN_URL = "/auth";
 
 const Login: React.FC = () => {

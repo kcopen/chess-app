@@ -5,6 +5,8 @@
 }
 
 .chatbox_header{
+    display:flex;
+    flex-flow:column nowrap;
     overflow-y: auto;
     background-color: #f1f1f0;
     margin:5px;
@@ -36,11 +38,11 @@
     border-radius:4px;
 }
 
-#you{
+.you{
     background-color:cadetblue;
 }
 
-#other{
+.other{
     background-color:green;
 }
 
@@ -55,7 +57,7 @@
 @media(min-width: 1200px){
   .chatbox{
     justify-content: flex-end;
-    height:800px;
+    height:100%;
     width: 300px;
   }
 
