@@ -64,13 +64,13 @@ const Register: React.FC<Props> = () => {
 	};
 
 	return !successfulRegistration ? (
-		<div className="register-page">
-			<main className="register-container">
+		<div className="basic-page">
+			<main className="basic-container">
 				<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
 					{errMsg}
 				</p>
-				<h1 className="register-title">Register</h1>
-				<form className="register-form" onSubmit={handleSubmit}>
+				<h1 className="basic-title">Register</h1>
+				<form className="basic-form" onSubmit={handleSubmit}>
 					<label htmlFor="first_name">First Name:</label>
 					<input
 						type="text"

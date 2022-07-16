@@ -51,13 +51,13 @@ const Login: React.FC = () => {
 	};
 
 	return !userProfile.username ? (
-		<div className="login-page">
-			<main className="login-container">
+		<div className="basic-page">
+			<main className="basic-container">
 				<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
 					{errMsg}
 				</p>
-				<h1 className="login-title">Log In</h1>
-				<form className="login-form" onSubmit={handleSubmit}>
+				<h1 className="basic-title">Log In</h1>
+				<form className="basic-form" onSubmit={handleSubmit}>
 					<label htmlFor="username">Username:</label>
 					<input
 						type="text"

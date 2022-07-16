@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import { useAuth } from "../../context/AuthProvider";
+import "./Profile.css";
 
 interface Props {}
 
@@ -8,9 +9,9 @@ const Profile: React.FC<Props> = (props: Props) => {
 	const { userProfile } = useAuth();
 
 	return (
-		<>
+		<div className="basic-page">
 			<Navbar />
-			<main>
+			<main className="basic-container">
 				<h1>{userProfile.username}</h1>
 				<h2>{userProfile.firstname}</h2>
 				<h2>{userProfile.lastname}</h2>
@@ -20,7 +21,7 @@ const Profile: React.FC<Props> = (props: Props) => {
 					<p>draws:{userProfile.chessStats?.draws}</p>
 				</section>
 			</main>
-		</>
+		</div>
 	);
 };
 

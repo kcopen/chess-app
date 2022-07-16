@@ -139,7 +139,7 @@ function ChessApp() {
 			{userProfile.username ? (
 				room !== "" && currentChessMatch !== null ? (
 					gameState.gameOver === false ? (
-						<div className="chess-app">
+						<div className="chess-app basic-page">
 							<ChessBoard userProfile={userProfile} room={room} playerColor={playerColor()} board={currentChessMatch.board} />
 							<div className="side-container">
 								<div className="missing-piece-container">{missingPieces()}</div>
