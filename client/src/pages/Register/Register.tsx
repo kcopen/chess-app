@@ -64,63 +64,65 @@ const Register: React.FC<Props> = () => {
 	};
 
 	return !successfulRegistration ? (
-		<section>
-			<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
-				{errMsg}
-			</p>
-			<h1>Register</h1>
-			<form onSubmit={handleSubmit}>
-				<label htmlFor="first_name">First Name:</label>
-				<input
-					type="text"
-					id="first_name"
-					ref={firstNameRef}
-					autoComplete="off"
-					onChange={(e) => setFirstName(e.target.value)}
-					value={firstName}
-					required
-				/>
+		<div className="register-page">
+			<main className="register-container">
+				<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+					{errMsg}
+				</p>
+				<h1 className="register-title">Register</h1>
+				<form className="register-form" onSubmit={handleSubmit}>
+					<label htmlFor="first_name">First Name:</label>
+					<input
+						type="text"
+						id="first_name"
+						ref={firstNameRef}
+						autoComplete="off"
+						onChange={(e) => setFirstName(e.target.value)}
+						value={firstName}
+						required
+					/>
 
-				<label htmlFor="last_name">Last Name:</label>
-				<input
-					type="text"
-					id="last_name"
-					autoComplete="off"
-					onChange={(e) => setLastName(e.target.value)}
-					value={lastName}
-					required
-				/>
+					<label htmlFor="last_name">Last Name:</label>
+					<input
+						type="text"
+						id="last_name"
+						autoComplete="off"
+						onChange={(e) => setLastName(e.target.value)}
+						value={lastName}
+						required
+					/>
 
-				<label htmlFor="username">Username:</label>
-				<input
-					type="text"
-					id="username"
-					autoComplete="off"
-					onChange={(e) => setUsername(e.target.value)}
-					value={username}
-					required
-				/>
+					<label htmlFor="username">Username:</label>
+					<input
+						type="text"
+						id="username"
+						autoComplete="off"
+						onChange={(e) => setUsername(e.target.value)}
+						value={username}
+						required
+					/>
 
-				<label htmlFor="password">Password:</label>
-				<input type="password" id="password" onChange={(e) => setPassword(e.target.value)} value={password} required />
+					<label htmlFor="password">Password:</label>
+					<input type="password" id="password" onChange={(e) => setPassword(e.target.value)} value={password} required />
 
-				<label htmlFor="password_confirmation">Confirm Password:</label>
-				<input
-					type="password"
-					id="password_confirmation"
-					onChange={(e) => setPasswordConfirmation(e.target.value)}
-					value={passwordConfirmation}
-					required
-				/>
-				<button>Sign In</button>
-			</form>
-			<p>
-				Already have an account? <br />
-				<span className="line">
-					<Link to="/login">Log In</Link>
-				</span>
-			</p>
-		</section>
+					<label htmlFor="password_confirmation">Confirm Password:</label>
+					<input
+						type="password"
+						id="password_confirmation"
+						onChange={(e) => setPasswordConfirmation(e.target.value)}
+						value={passwordConfirmation}
+						required
+					/>
+					<button>Sign Up</button>
+				</form>
+				<p>
+					Already have an account? <br />
+					<span className="line">
+						<Link to="/login">Log In</Link>
+					</span>
+				</p>
+			</main>
+		</div>
 	) : (
 		<Navigate to="/login" />
 	);

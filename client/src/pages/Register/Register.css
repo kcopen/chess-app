@@ -1,0 +1,50 @@
+/*0px - 768px */
+.register-page {
+    display: flex;
+    flex-flow: column wrap;
+    background-color:rgb(151, 148, 144);
+    height: 100vh;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+.register-container {
+    display: flex;
+    flex-flow: column wrap;
+    background-color:rgb(187, 187, 187);
+    border:2px solid black;
+    border-radius: 2%;
+    padding: 2rem;
+}
+
+.register-title {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 2.3em;
+}
+.register-form {
+  display:flex;
+  flex-flow: column wrap;
+  border:2px solid black;
+  border-radius: 2%;
+  background-color: gray;
+  padding: 1rem;
+  max-width: 300px;
+}
+
+.register-form input {
+  margin-bottom: 1em;
+}
+
+@media(min-width: 768px){
+
+}
+
+@media(min-width: 992px){
+
+}
+
+@media(min-width: 1200px){
+  
+  
+}
