@@ -239,3 +239,5 @@ export const initBoard = (): Chessboard =>{
 	const squares = initSquares(pieces);
 	return {squares, pieces, turn: ChessColor.White, prevMove: undefined};
 }
+
+

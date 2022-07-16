@@ -1,4 +1,5 @@
-import { ChessMove, PieceType, Square, Chessboard, Piece, Coords, ChessColor } from "./ChessTypes";
+import { ChessMove, PieceType, Square, Chessboard, Piece, Coords, ChessColor, ChessMatch } from './ChessTypes';
+import { initBoard } from './boardInit';
 
 const GRID_SIZE=8;
 
@@ -123,6 +124,18 @@ export const boardAfterMove = (move: ChessMove): Chessboard => {
 		pieceBeingMoved.coords.x = targetCoords.x;
 		pieceBeingMoved.coords.y = targetCoords.y;
 		pieceBeingMoved.moveCount = pieceBeingMoved.moveCount + 1;
+		if(isPawnUpgrade(move)){
+			//todo add choice
+			const pieceToUpgradeTo:Piece = {
+				name: `${pieceBeingMoved.pieceColor === ChessColor.White ? "w" : "b"}q${pieceBeingMoved.name[2]}u`,
+				pieceType: PieceType.Queen,
+				pieceColor: pieceBeingMoved.pieceColor,
+				coords: pieceBeingMoved.coords,
+				moveCount: 0
+			};
+			updatedBoard.pieces.filter((p)=>!isSameCoords({ x: pieceToUpgradeTo.coords.x, y: pieceToUpgradeTo.coords.y }, p.coords));
+			updatedBoard.pieces.push(pieceToUpgradeTo);
+		}
 	}
 
 	if(isCastle(move)){
@@ -133,7 +146,7 @@ export const boardAfterMove = (move: ChessMove): Chessboard => {
 				friendlyRook.moveCount = friendlyRook.moveCount + 1;
 			}
 		}
-	}
+	} 
 
 	//update the squares on the board
 	updatedBoard.squares.forEach((s) => {
@@ -217,6 +230,19 @@ function isEmpessant({ board, pieceToMove, targetCoords }: ChessMove): boolean {
 	}
 		
 	return false;
+}
+
+function isPawnUpgrade({ board, pieceToMove, targetCoords }: ChessMove): boolean{
+	if(pieceToMove.pieceType !== PieceType.Pawn) return false;
+	if((pieceToMove.pieceColor === ChessColor.White && targetCoords.y === 8) || 
+		(pieceToMove.pieceColor === ChessColor.Black && targetCoords.y === 1)){
+			return true;
+	}
+	return false;
+}
+
+function upgradePawn({ board, pieceToMove, targetCoords }: ChessMove) {
+
 }
 
 function isValidPawnMove({ board, pieceToMove, targetCoords }: ChessMove): boolean {
@@ -446,3 +472,43 @@ export const squareName = (coords:Coords): string =>{
 			return ""
 	}
 }
+
+export const pieceTypeByLetter = (letter: string) => {
+	switch(letter){
+		case "r":
+			return PieceType.Rook;
+		case "n":
+			return PieceType.Knight;
+		case "b":
+			return PieceType.Bishop;
+		case "k":
+			return PieceType.King;
+		case "q":
+			return PieceType.Queen;
+		case "p":
+			return PieceType.Pawn;
+		default:
+			return PieceType.Pawn;
+	}
+}
+
+export const pieceLetterByType = (pieceType: PieceType): string => {
+	switch(pieceType){
+		case PieceType.Rook:
+			return "r";
+		case PieceType.Knight:
+			return "n";
+		case PieceType.Bishop:
+			return "b";
+		case PieceType.King:
+			return "k";
+		case PieceType.Queen:
+			return "q";
+		case PieceType.Pawn:
+			return "p";
+		default:
+			return "p";
+	}
+}
+
+

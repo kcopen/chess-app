@@ -5,19 +5,18 @@ import { Socket } from "socket.io-client";
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
 import { useAuth } from "../../context/AuthProvider";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Chatbox from "../../components/Chatbox/Chatbox";
-import Navbar from "../../components/Navbar/Navbar";
 import { SocketContext } from "../../App";
-import { forEachChild } from "typescript";
-import { stringify } from "querystring";
+import { initPieces } from "../../shared-libs/chessEngine/boardInit";
+import { ChessPiece } from "../../components/ChessPiece/ChessPiece";
+import { pieceTypeByLetter } from "../../shared-libs/chessEngine/chessRules";
 
 function ChessApp() {
 	const { userProfile } = useAuth();
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const [room, setRoom] = useState<string>("");
 	const [currentChessMatch, setCurrentChessMatch] = useState<ChessMatch | null>(null);
-	const [removedPieces, setRemovedPieces] = useState<Piece[]>([]);
 	const [opponentDraw, setOpponentDraw] = useState<boolean>(false);
 	const [gameState, setGameState] = useState({
 		gameOver: false,
@@ -33,9 +32,57 @@ function ChessApp() {
 		}
 	};
 
+	const missingPieces = (): JSX.Element[] => {
+		const startingPieceNames = [
+			"wr1",
+			"wn1",
+			"wb1",
+			"wk",
+			"wq",
+			"wb2",
+			"wn2",
+			"wr2",
+			"wp1",
+			"wp2",
+			"wp3",
+			"wp4",
+			"wp5",
+			"wp6",
+			"wp7",
+			"wp8",
+			"br1",
+			"brn",
+			"bb1",
+			"bk",
+			"bq",
+			"bb2",
+			"bn2",
+			"br2",
+			"bp1",
+			"bp2",
+			"bp3",
+			"bp4",
+			"bp5",
+			"bp6",
+			"bp7",
+			"bp8",
+		];
+		let missingPieces: string[] = [];
+		startingPieceNames.forEach((sp) => {
+			if (!currentChessMatch?.board.pieces.find((p) => p.name === sp)) {
+				missingPieces.push(sp);
+			}
+		});
+		const piecelist = missingPieces.map((p) => {
+			return <ChessPiece pieceType={pieceTypeByLetter(p[1])} pieceColor={p[0] === "w" ? ChessColor.White : ChessColor.Black} />;
+		});
+		return piecelist;
+	};
+
 	useLayoutEffect(() => {
 		if (userProfile.username && userProfile.password) {
 			socket.emit("login_request", { username: userProfile.username, password: userProfile.password });
+			socket.emit("get_current_game_info", userProfile);
 		}
 	}, []);
 
@@ -44,11 +91,6 @@ function ChessApp() {
 			setRoom(room);
 		});
 		socket.on("match_update", (match) => {
-			const prevPieces = currentChessMatch?.board.pieces;
-			const nextPieces = match.board.pieces;
-			if (prevPieces && nextPieces.length < prevPieces.length) {
-				prevPieces.forEach((piece) => {});
-			}
 			setCurrentChessMatch(match);
 			switch (match.result) {
 				case ChessMatchResult.Draw:
@@ -60,13 +102,13 @@ function ChessApp() {
 				case ChessMatchResult.BlackWins:
 					setGameState({
 						gameOver: true,
-						message: "Black won.",
+						message: playerColor() === ChessColor.Black ? "Black (you) won! Good job." : "Black (opponent) won, you lost.",
 					});
 					break;
 				case ChessMatchResult.WhiteWins:
 					setGameState({
 						gameOver: true,
-						message: "White won.",
+						message: playerColor() === ChessColor.White ? "White (you) won! Good job." : "White (opponent) won, you lost.",
 					});
 					break;
 				case ChessMatchResult.Stalemate:
@@ -92,12 +134,6 @@ function ChessApp() {
 		}
 	}
 
-	function joinRandomGame() {
-		if (userProfile.username) {
-			socket.emit("join_queue", userProfile);
-		}
-	}
-
 	return (
 		<>
 			{userProfile.username ? (
@@ -106,7 +142,7 @@ function ChessApp() {
 						<div className="chess-app">
 							<ChessBoard userProfile={userProfile} room={room} playerColor={playerColor()} board={currentChessMatch.board} />
 							<div className="side-container">
-								<div className="missing-piece-container"></div>
+								<div className="missing-piece-container">{missingPieces()}</div>
 								<button onClick={() => resign()}>Resign</button>
 								<button className={`draw-button${opponentDraw ? "-highlighted" : ""}`} onClick={() => requestDraw()}>
 									Request Draw
@@ -117,10 +153,11 @@ function ChessApp() {
 					) : (
 						<div className="chess-app-game-over">
 							<h1>{gameState.message}</h1>
+							<Link to="/">Return to home page</Link>
 						</div>
 					)
 				) : (
-					<button onClick={() => joinRandomGame()}>Join Room</button>
+					<></>
 				)
 			) : (
 				<Navigate to="/login" />

@@ -79,7 +79,7 @@ const Login: React.FC = () => {
 			</p>
 		</section>
 	) : (
-		<Navigate to="/chess" />
+		<Navigate to="/" />
 	);
 };
 
