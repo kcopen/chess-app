@@ -9,19 +9,21 @@ const Profile: React.FC<Props> = (props: Props) => {
 	const { userProfile } = useAuth();
 
 	return (
-		<div className="basic-page">
+		<>
 			<Navbar />
-			<main className="basic-container">
-				<h1>{userProfile.username}</h1>
-				<h2>{userProfile.firstname}</h2>
-				<h2>{userProfile.lastname}</h2>
-				<section>
-					<p>wins:{userProfile.chessStats?.wins}</p>
-					<p>losses:{userProfile.chessStats?.losses}</p>
-					<p>draws:{userProfile.chessStats?.draws}</p>
-				</section>
-			</main>
-		</div>
+			<div className="basic-page">
+				<main className="basic-container">
+					<h1>{userProfile.username}</h1>
+					<h2>{userProfile.firstname}</h2>
+					<h2>{userProfile.lastname}</h2>
+					<section>
+						<p>wins:{userProfile.chessStats?.wins}</p>
+						<p>losses:{userProfile.chessStats?.losses}</p>
+						<p>draws:{userProfile.chessStats?.draws}</p>
+					</section>
+				</main>
+			</div>
+		</>
 	);
 };
 

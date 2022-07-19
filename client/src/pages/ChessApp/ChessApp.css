@@ -9,6 +9,11 @@
   color:white;
 }
 
+.missing-piece-container {
+  background-color: aliceblue;
+  display: flex;
+}
+
 
 @media(min-width: 768px){
 
@@ -27,6 +32,8 @@
     align-items:flex-start;
   }
   .side-container {
+    display: flex;
+    flex-flow:column nowrap;
     height: 800px;
   }
 }

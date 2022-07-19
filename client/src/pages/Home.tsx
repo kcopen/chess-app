@@ -21,17 +21,15 @@ const Home: React.FC<Props> = () => {
 	}
 
 	return (
-		<div className="home">
-			{!userProfile.username ? (
-				<Navigate to="/login" />
-			) : (
-				<>
-					<Navbar />
+		<>
+			<Navbar />
+			<div className="basic-page">
+				<div className="basic-container">
 					<button onClick={() => joinRandomMatch()}>Join random match.</button>
 					{inMatch && <Navigate to="/chess" />}
-				</>
-			)}
-		</div>
+				</div>
+			</div>
+		</>
 	);
 };
 

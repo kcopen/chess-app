@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
+import RequireAuth from "./App/RequireAuth";
 import { AuthProvider } from "./context/AuthProvider";
 import ChessApp from "./pages/ChessApp/ChessApp";
 import Home from "./pages/Home";
@@ -16,11 +17,14 @@ const App: React.FC = () => {
 		<AuthProvider>
 			<SocketContext.Provider value={socket}>
 				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/chess" element={<ChessApp />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
-					<Route path="/profile" element={<Profile />} />
+
+					<Route element={<RequireAuth />}>
+						<Route path="/chess" element={<ChessApp />} />
+						<Route path="/" element={<Home />} />
+						<Route path="/profile" element={<Profile />} />
+					</Route>
 				</Routes>
 			</SocketContext.Provider>
 		</AuthProvider>

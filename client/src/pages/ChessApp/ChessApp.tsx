@@ -73,9 +73,13 @@ function ChessApp() {
 				missingPieces.push(sp);
 			}
 		});
+		console.log(missingPieces);
 		const piecelist = missingPieces.map((p) => {
-			return <ChessPiece pieceType={pieceTypeByLetter(p[1])} pieceColor={p[0] === "w" ? ChessColor.White : ChessColor.Black} />;
+			return (
+				<ChessPiece key={p} pieceType={pieceTypeByLetter(p[1])} pieceColor={p[0] === "w" ? ChessColor.White : ChessColor.Black} />
+			);
 		});
+		console.log(piecelist);
 		return piecelist;
 	};
 
@@ -142,7 +146,7 @@ function ChessApp() {
 						<div className="chess-app basic-page">
 							<ChessBoard userProfile={userProfile} room={room} playerColor={playerColor()} board={currentChessMatch.board} />
 							<div className="side-container">
-								<div className="missing-piece-container">{missingPieces()}</div>
+								<div className="missing-piece-container">{[...missingPieces()]}</div>
 								<button onClick={() => resign()}>Resign</button>
 								<button className={`draw-button${opponentDraw ? "-highlighted" : ""}`} onClick={() => requestDraw()}>
 									Request Draw
