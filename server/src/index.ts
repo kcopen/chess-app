@@ -62,21 +62,49 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 const gameManager = new GameManager();
 
 io.on("connection", (socket)=>{
-    socket.on("login_request", (userProfile)=>{
+
+    socket.on("login", (userProfile)=>{
         if(userProfile){
             socket.data.userProfile = userProfile;
             socket.join(userProfile.username);
             console.log(`Username:${userProfile.username} has logged in.`)
         }
     });
-    
-    socket.on("join_queue", (user)=>{
-        const game = gameManager.joinQueue(user);
+
+//--matchmaking--
+    socket.on("quick_match", (user)=>{
+        const game = gameManager.quick_match(user);
         const room = game.getRoom();
         const match = game.getMatch();
+
         socket.join(room);
         io.to(user.username).emit("current_room_info", room);
         io.to(room).emit("match_update", match);
+    });
+//TODO
+    socket.on("rated_match", (user)=>{
+        
+    });
+
+//TODO
+    socket.on("host_private_match", (user, room)=>{
+            
+    });
+
+//TODO
+    socket.on("join_private_match", (user, room)=>{
+            
+    });
+
+//--
+    socket.on("attempt_move", (userProfile, room, move)=>{
+        const updatedBoard = gameManager.attemptMove(room, userProfile, move);
+        if(updatedBoard){
+            const updatedMatch = gameManager.getGame(room)?.getMatch();
+            if(updatedMatch){
+                io.to(room).emit("match_update", updatedMatch);
+            }
+        }
     });
 
     socket.on("get_current_game_info",(user: UserProfile)=>{
@@ -90,29 +118,16 @@ io.on("connection", (socket)=>{
         
     });
 
-    socket.on("join_chess_room_request", (user, room)=>{
-        gameManager.joinGame(room, user);
+//--
+    socket.on("send_chat_message", (userProfile, room, message)=>{
         const game = gameManager.getGame(room);
-        if(game){
-            io.to(user.username).emit("current_room_info", room);
-            const match = game.getMatch();
-            if(match){
-                io.to(room).emit("match_update", match);
-            }
-            
+        if(game?.isPlayerInGame(userProfile)){
+            io.to(room).emit("chatbox_update", userProfile.username, message);
         }
     });
+    //add friend
 
-    socket.on("attempt_move", (userProfile, room, move)=>{
-        const updatedBoard = gameManager.attemptMove(room, userProfile, move);
-        if(updatedBoard){
-            const updatedMatch = gameManager.getGame(room)?.getMatch();
-            if(updatedMatch){
-                io.to(room).emit("match_update", updatedMatch);
-            }
-        }
-    });
-
+//--
     socket.on("resign", (room, userProfile)=>{
         const game = gameManager.getGame(room);
         if(game){
@@ -135,13 +150,8 @@ io.on("connection", (socket)=>{
         }
     });
 
-    socket.on("send_chat_message", (userProfile, room, message)=>{
-        const game = gameManager.getGame(room);
-        if(game?.isPlayerInGame(userProfile)){
-            io.to(room).emit("chatbox_update", userProfile.username, message);
-        }
-    });
-
+    
+//--
     socket.on("disconnect", (reason)=>{
         console.log(`Userid:${socket.id} disconnected from server.`);
     })

@@ -12,14 +12,16 @@ import { ServerToClientEvents, ClientToServerEvents } from "./shared-libs/socket
 
 export const SocketContext = createContext<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
 const App: React.FC = () => {
-	const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>>(io("http://localhost:3500").connect());
+	const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>>(io("http://localhost:3500"));
 	return (
 		<AuthProvider>
+			<Routes>
+				<Route path="/login" element={<Login />} />
+				<Route path="/register" element={<Register />} />
+			</Routes>
+
 			<SocketContext.Provider value={socket}>
 				<Routes>
-					<Route path="/login" element={<Login />} />
-					<Route path="/register" element={<Register />} />
-
 					<Route element={<RequireAuth />}>
 						<Route path="/chess" element={<ChessApp />} />
 						<Route path="/" element={<Home />} />

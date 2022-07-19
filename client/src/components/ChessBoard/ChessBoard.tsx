@@ -6,7 +6,7 @@ import "./ChessBoard.css";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
 import { Socket } from "socket.io-client";
 import { UserProfile } from "../../shared-libs/UserProfile";
-import { getValidTeamMoves, inGridBounds, isSameCoords } from "../../shared-libs/chessEngine/chessRules";
+import { getValidPieceMoves, getValidTeamMoves, inGridBounds, isSameCoords } from "../../shared-libs/chessEngine/chessRules";
 import { initBoard } from "../../shared-libs/chessEngine/boardInit";
 import { SocketContext } from "../../App";
 
@@ -21,13 +21,13 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor, bo
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const chessBoardRef = useRef<HTMLDivElement>(null);
 
-	const validMoves: ChessMove[] = playerColor ? getValidTeamMoves(playerColor, board) : [];
-
 	const [activePiece, setActivePiece] = useState<{
 		piece: Piece;
 		element: HTMLElement;
 		grabCoords: { gridX: number; gridY: number };
 	} | null>(null);
+
+	const validMoves: ChessMove[] = activePiece ? getValidPieceMoves(activePiece.piece, board) : [];
 
 	//attempt to take turn
 	function attemptTurn(suggestedMove: ChessMove) {
@@ -40,9 +40,12 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor, bo
 		const element = e.target as HTMLElement;
 		if (element.classList.contains("chess-piece") && chessBoard) {
 			//mouse position in grid units
-			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / SQUARE_SIZE);
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / SQUARE_SIZE));
-
+			let gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / SQUARE_SIZE);
+			let gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / SQUARE_SIZE));
+			if (playerColor === ChessColor.Black) {
+				gridX = 9 - gridX;
+				gridY = 9 - gridY;
+			}
 			//position of element to render (mouse location in pixels)
 			const x = e.clientX - PIECE_SIZE() / 2;
 			const y = e.clientY - PIECE_SIZE() / 2;
@@ -69,8 +72,13 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor, bo
 			const maxX = minX + BOARD_SIZE();
 			const maxY = minY + BOARD_SIZE();
 
-			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE());
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / PIECE_SIZE()));
+			let gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE());
+			let gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / PIECE_SIZE()));
+			if (playerColor === ChessColor.Black) {
+				gridX = 9 - gridX;
+				gridY = 9 - gridY;
+			}
+
 			const gridCoords: Coords = { x: gridX, y: gridY };
 			if (!inGridBounds(gridCoords)) {
 				activePiece.element.style.position = "relative";
@@ -101,8 +109,12 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor, bo
 		const chessBoard = chessBoardRef.current;
 		if (activePiece && chessBoard) {
 			//current grid coordinates of mouse
-			const gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE());
-			const gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / PIECE_SIZE()));
+			let gridX = Math.ceil((e.clientX - chessBoard.offsetLeft) / PIECE_SIZE());
+			let gridY = Math.abs(Math.floor((e.clientY - chessBoard.offsetTop - BOARD_SIZE()) / PIECE_SIZE()));
+			if (playerColor === ChessColor.Black) {
+				gridX = 9 - gridX;
+				gridY = 9 - gridY;
+			}
 			const gridCoords: Coords = { x: gridX, y: gridY };
 
 			//reset the styles and set active piece to null aka "drop" the element
@@ -141,7 +153,7 @@ export const ChessBoard: React.FC<Props> = ({ userProfile, room, playerColor, bo
 			onMouseUp={(e) => dropPiece(e)}
 			ref={chessBoardRef}
 		>
-			{[...squareElements]}
+			{playerColor === ChessColor.Black ? [...squareElements.reverse()] : [...squareElements]}
 		</div>
 	);
 };

@@ -12,6 +12,15 @@
 .missing-piece-container {
   background-color: aliceblue;
   display: flex;
+  flex-flow:row wrap;
+  align-items:flex-start;
+  justify-content:center;
+  height:30%;
+}
+
+.missing-piece-container .chess-piece{
+  max-width: 3rem;
+  max-height: 3rem;
 }
 
 

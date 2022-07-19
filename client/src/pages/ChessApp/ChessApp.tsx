@@ -51,7 +51,7 @@ function ChessApp() {
 			"wp7",
 			"wp8",
 			"br1",
-			"brn",
+			"bn1",
 			"bb1",
 			"bk",
 			"bq",
@@ -73,19 +73,16 @@ function ChessApp() {
 				missingPieces.push(sp);
 			}
 		});
-		console.log(missingPieces);
 		const piecelist = missingPieces.map((p) => {
 			return (
 				<ChessPiece key={p} pieceType={pieceTypeByLetter(p[1])} pieceColor={p[0] === "w" ? ChessColor.White : ChessColor.Black} />
 			);
 		});
-		console.log(piecelist);
 		return piecelist;
 	};
 
 	useLayoutEffect(() => {
-		if (userProfile.username && userProfile.password) {
-			socket.emit("login_request", { username: userProfile.username, password: userProfile.password });
+		if (userProfile.username) {
 			socket.emit("get_current_game_info", userProfile);
 		}
 	}, []);
@@ -97,6 +94,12 @@ function ChessApp() {
 		socket.on("match_update", (match) => {
 			setCurrentChessMatch(match);
 			switch (match.result) {
+				case ChessMatchResult.Unfinished:
+					setGameState({
+						gameOver: false,
+						message: "",
+					});
+					break;
 				case ChessMatchResult.Draw:
 					setGameState({
 						gameOver: true,
@@ -144,7 +147,12 @@ function ChessApp() {
 				room !== "" && currentChessMatch !== null ? (
 					gameState.gameOver === false ? (
 						<div className="chess-app basic-page">
+							<div>
+								<h3 className="opponent-name">{currentChessMatch.blackPlayer.username}</h3>
+								<h3 className="opponent-name">{currentChessMatch.whitePlayer.username}</h3>
+							</div>
 							<ChessBoard userProfile={userProfile} room={room} playerColor={playerColor()} board={currentChessMatch.board} />
+
 							<div className="side-container">
 								<div className="missing-piece-container">{[...missingPieces()]}</div>
 								<button onClick={() => resign()}>Resign</button>

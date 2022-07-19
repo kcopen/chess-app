@@ -43,6 +43,10 @@ const UsersSchema = new mongoose.Schema({
                 type: Number,
                 required: true,
             },
+            rating: {
+                type: Number,
+                required: true,
+            },
         required: false,
         },
         required: false,

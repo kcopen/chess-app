@@ -5,15 +5,61 @@ import { ChessGame } from "./game";
 export class GameManager{
     private activeGames: ChessGame[];
     private roomIncrementer: number;
-    
+    private ratedGameQueue: UserProfile[];
     
     constructor(){
         this.activeGames = [];
+        this.ratedGameQueue = [];
         this.roomIncrementer = 1000;
         this.addGame();
     }
 
-    public joinQueue(user: UserProfile): ChessGame{
+    public quick_match(user: UserProfile): ChessGame {
+        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        nextGame.joinGame(user);
+        if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
+            nextGame.startGame();
+            this.addGame();
+        }
+        return nextGame;
+    }
+//TODO
+    public rated_match(user: UserProfile): ChessGame {
+        const rating = user.chessStats ? user.chessStats.rating : 0;
+        let closestRatedPlayer: UserProfile;
+        this.ratedGameQueue.forEach((opponent)=>{
+            if(user.chessStats && opponent.chessStats){
+                const diff = user.chessStats.rating - opponent.chessStats.rating;
+                if(closestRatedPlayer.chessStats){
+                    const currClosestDiff = user.chessStats.rating - closestRatedPlayer.chessStats.rating
+                    if(Math.abs(diff) < currClosestDiff){
+                        
+                    }
+                } else {
+                    closestRatedPlayer = opponent;
+                }
+                
+            }
+            
+        })
+        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        
+        return nextGame;
+    }
+
+    //TODO
+    public host_private_match(user: UserProfile): ChessGame {
+        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        nextGame.joinGame(user);
+        if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
+            nextGame.startGame();
+            this.addGame();
+        }
+        return nextGame;
+    }
+
+    //TODO
+    public join_private_match(user: UserProfile): ChessGame {
         const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
         nextGame.joinGame(user);
         if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){

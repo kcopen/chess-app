@@ -11,8 +11,14 @@ interface Props {
 
 export const ChessSquare: React.FC<Props> = ({ isHighlighted, square }: Props) => {
 	const squareStyles = {
-		backgroundColor: square.color === ChessColor.White ? WHITE_SQUARE_COLOR : BLACK_SQUARE_COLOR,
-		border: isHighlighted ? `${HIGHLIGHTED_BORDER_SIZE}px solid red` : `none`,
+		backgroundColor:
+			square.color === ChessColor.White
+				? isHighlighted
+					? "#e4a19c"
+					: WHITE_SQUARE_COLOR
+				: isHighlighted
+				? "#944936"
+				: BLACK_SQUARE_COLOR,
 	};
 
 	const pieceElement = () => {

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { SocketContext } from "../App";
@@ -13,9 +13,15 @@ const Home: React.FC<Props> = () => {
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const [inMatch, setInMatch] = useState<boolean>(false);
 
-	function joinRandomMatch() {
+	useLayoutEffect(() => {
 		if (userProfile.username) {
-			socket.emit("join_queue", userProfile);
+			socket.emit("login", userProfile);
+		}
+	}, []);
+
+	function quickMatch() {
+		if (userProfile.username) {
+			socket.emit("quick_match", userProfile);
 			setInMatch(true);
 		}
 	}
@@ -25,7 +31,7 @@ const Home: React.FC<Props> = () => {
 			<Navbar />
 			<div className="basic-page">
 				<div className="basic-container">
-					<button onClick={() => joinRandomMatch()}>Join random match.</button>
+					<button onClick={() => quickMatch()}>Quick Match</button>
 					{inMatch && <Navigate to="/chess" />}
 				</div>
 			</div>

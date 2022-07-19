@@ -2,5 +2,4 @@
 .chess-square {
     aspect-ratio: 1;
     place-content:center;
-    border-collapse: collapse;
 }
