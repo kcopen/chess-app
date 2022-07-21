@@ -39,6 +39,7 @@ app.post("/register", async (req, res)=>{
             wins: 0,
             losses: 0,
             draws: 0,
+            rating: 0,
         }
 
     });

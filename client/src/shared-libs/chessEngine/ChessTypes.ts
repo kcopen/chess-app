@@ -56,13 +56,13 @@ export enum ChessMatchResult {
 	Draw = "draw",
 	WhiteWins = "white_wins",
 	BlackWins = "black_wins",
-	Stalemate = "stalemate"
 }
 
 export interface ChessMatch {
 	whitePlayer: ChessPlayer;
 	blackPlayer: ChessPlayer;
 	board: Chessboard;
+	timer: {white:number, black: number};
 	result: ChessMatchResult;
 }
 

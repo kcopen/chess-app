@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 
 interface Props {
-	timeLimit: number; //time limit in seconds
+	time: number; //time limit in seconds
+	isPaused: boolean;
 }
 
-export const ChessTimer: React.FC<Props> = ({ timeLimit }: Props) => {
-	const [currentTime, setCurrentTime] = useState<number>(timeLimit);
-	const [timerRunning, setTimerRunning] = useState<Boolean>(false);
+export const ChessTimer: React.FC<Props> = ({ time, isPaused }: Props) => {
+	const [currentTime, setCurrentTime] = useState<number>(time);
 	useEffect(() => {
-		setTimeout(() => {
-			if (currentTime > 0) {
+		setTimeout(async () => {
+			if (!isPaused) {
 				setCurrentTime(currentTime - 1);
 			}
 		}, 1000);

@@ -12,6 +12,7 @@ import { initPieces } from "../../shared-libs/chessEngine/boardInit";
 import { ChessPiece } from "../../components/ChessPiece/ChessPiece";
 import { pieceTypeByLetter } from "../../shared-libs/chessEngine/chessRules";
 import { ChessTimer } from "../../components/ChessTimer/ChessTimer";
+import { match } from "assert";
 
 function ChessApp() {
 	const { userProfile } = useAuth();
@@ -119,12 +120,6 @@ function ChessApp() {
 						message: playerColor() === ChessColor.White ? "White (you) won! Good job." : "White (opponent) won, you lost.",
 					});
 					break;
-				case ChessMatchResult.Stalemate:
-					setGameState({
-						gameOver: true,
-						message: "The game ended in a stalemate. It was a draw.",
-					});
-					break;
 			}
 		});
 		socket.on("draw_requested", (drawRequested) => setOpponentDraw(drawRequested));
@@ -155,7 +150,7 @@ function ChessApp() {
 											? currentChessMatch.blackPlayer.username
 											: currentChessMatch.whitePlayer.username}
 									</h3>
-									<ChessTimer timeLimit={5 * 60} />
+									<ChessTimer time={5 * 60} isPaused={currentChessMatch.board.turn === playerColor()} />
 								</div>
 
 								<ChessBoard
@@ -171,7 +166,7 @@ function ChessApp() {
 												? currentChessMatch.blackPlayer.username
 												: currentChessMatch.whitePlayer.username}
 										</h3>
-										<ChessTimer timeLimit={5 * 60} />
+										<ChessTimer time={5 * 60} isPaused={currentChessMatch.board.turn !== playerColor()} />
 									</div>
 								</div>
 							</div>
