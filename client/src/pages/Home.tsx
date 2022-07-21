@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { SocketContext } from "../App";
@@ -13,7 +13,7 @@ const Home: React.FC<Props> = () => {
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const [inMatch, setInMatch] = useState<boolean>(false);
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (userProfile.username) {
 			socket.emit("login", userProfile);
 		}

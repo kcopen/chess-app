@@ -9,6 +9,15 @@
   color:white;
 }
 
+.draw-button:hover {
+  background-color:rgb(109, 104, 104);
+}
+
+.draw-button-highlighted:hover {
+  background-color:rgb(70, 29, 29);
+  color:white;
+}
+
 .missing-piece-container {
   background-color: aliceblue;
   display: flex;
@@ -21,6 +30,30 @@
 .missing-piece-container .chess-piece{
   max-width: 3rem;
   max-height: 3rem;
+}
+
+.column-container {
+  display: flex;
+  flex-flow:column nowrap;
+}
+
+.timecard {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+  
+}
+
+.black-team {
+  background-color:#444444;
+  color: white;
+}
+
+.white-team {
+  background-color:#cccccc;
+  color: black;
 }
 
 
@@ -38,7 +71,7 @@
     height: 100vh;
     align-content:center;
     justify-content: center;
-    align-items:flex-start;
+    align-items:center;
   }
   .side-container {
     display: flex;

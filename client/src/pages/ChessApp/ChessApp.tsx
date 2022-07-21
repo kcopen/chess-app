@@ -11,6 +11,7 @@ import { SocketContext } from "../../App";
 import { initPieces } from "../../shared-libs/chessEngine/boardInit";
 import { ChessPiece } from "../../components/ChessPiece/ChessPiece";
 import { pieceTypeByLetter } from "../../shared-libs/chessEngine/chessRules";
+import { ChessTimer } from "../../components/ChessTimer/ChessTimer";
 
 function ChessApp() {
 	const { userProfile } = useAuth();
@@ -147,12 +148,33 @@ function ChessApp() {
 				room !== "" && currentChessMatch !== null ? (
 					gameState.gameOver === false ? (
 						<div className="chess-app basic-page">
-							<div>
-								<h3 className="opponent-name">{currentChessMatch.blackPlayer.username}</h3>
-								<h3 className="opponent-name">{currentChessMatch.whitePlayer.username}</h3>
-							</div>
-							<ChessBoard userProfile={userProfile} room={room} playerColor={playerColor()} board={currentChessMatch.board} />
+							<div className="column-container">
+								<div className={"timecard"}>
+									<h3>
+										{playerColor() === ChessColor.White
+											? currentChessMatch.blackPlayer.username
+											: currentChessMatch.whitePlayer.username}
+									</h3>
+									<ChessTimer timeLimit={5 * 60} />
+								</div>
 
+								<ChessBoard
+									userProfile={userProfile}
+									room={room}
+									playerColor={playerColor()}
+									board={currentChessMatch.board}
+								/>
+								<div className="column-container">
+									<div className={"timecard"}>
+										<h3>
+											{playerColor() === ChessColor.Black
+												? currentChessMatch.blackPlayer.username
+												: currentChessMatch.whitePlayer.username}
+										</h3>
+										<ChessTimer timeLimit={5 * 60} />
+									</div>
+								</div>
+							</div>
 							<div className="side-container">
 								<div className="missing-piece-container">{[...missingPieces()]}</div>
 								<button onClick={() => resign()}>Resign</button>
