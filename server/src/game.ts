@@ -41,28 +41,30 @@ export class ChessGame{
 
     //add updating to database
     private endMatch(result: ChessMatchResult){
+        if(result === ChessMatchResult.Unfinished) return false;
+
         if(this.gameStatus === GameStatus.GameRunning){
             this.gameStatus = GameStatus.GameOver;
             this.matchResult = result;
             if(this.whitePlayer){
                 if(result === ChessMatchResult.WhiteWins){
-                    UserModel.findOneAndUpdate({username:this.whitePlayer.username}, {$inc:{chessStats:{wins: 1}}}).exec();
+                    UserModel.findOneAndUpdate({username:this.whitePlayer.username}, {$inc:{'chessStats.wins': 1 }}).exec();
                 } else if(result === ChessMatchResult.Draw ){
-                    UserModel.findOneAndUpdate({username:this.whitePlayer.username}, {$inc:{chessStats:{draws: 1}}}).exec();
+                    UserModel.findOneAndUpdate({username:this.whitePlayer.username}, {$inc:{'chessStats.draws': 1}}).exec();
 
                 } else if(result === ChessMatchResult.BlackWins ){
-                    UserModel.findOneAndUpdate({username:this.whitePlayer.username}, {$inc:{chessStats:{losses: 1}}}).exec();
+                    UserModel.findOneAndUpdate({username:this.whitePlayer.username}, {$inc:{'chessStats.losses': 1}}).exec();
 
                 }
             }
             if(this.blackPlayer){
                 if(result === ChessMatchResult.WhiteWins){
-                    UserModel.findOneAndUpdate({username:this.blackPlayer.username}, {$inc:{chessStats:{losses: 1}}}).exec();
+                    UserModel.findOneAndUpdate({username:this.blackPlayer.username}, {$inc:{'chessStats.losses': 1}}).exec();
 
                 } else if(result === ChessMatchResult.Draw ){
-                    UserModel.findOneAndUpdate({username:this.blackPlayer.username}, {$inc:{chessStats:{draws: 1}}}).exec();
+                    UserModel.findOneAndUpdate({username:this.blackPlayer.username}, {$inc:{'chessStats.draws': 1}}).exec();
                 } else if(result === ChessMatchResult.BlackWins ){
-                    UserModel.findOneAndUpdate({username:this.blackPlayer.username}, {$inc:{chessStats:{wins: 1}}}).exec();
+                    UserModel.findOneAndUpdate({username:this.blackPlayer.username}, {$inc:{'chessStats.wins': 1}}).exec();
                 }
             }
             
@@ -174,16 +176,14 @@ export class ChessGame{
         if(this.gameStatus !== GameStatus.GameRunning)return false;
         if(player.username === this.whitePlayer?.username){
             this.pendingDrawRequest.whitePlayer = true;
-            if(this.pendingDrawRequest.blackPlayer === true){
-                this.endMatch(ChessMatchResult.Draw);
-                return true;
-            }
+            
         }else if(player.username === this.blackPlayer?.username){
             this.pendingDrawRequest.blackPlayer = true;
-            if(this.pendingDrawRequest.whitePlayer === true){
-                this.endMatch(ChessMatchResult.Draw);
-                return true;
-            }
+        }
+
+        if(this.pendingDrawRequest.whitePlayer === true && this.pendingDrawRequest.blackPlayer === true){
+            this.endMatch(ChessMatchResult.Draw);
+            return true;
         }
         return false;
     }

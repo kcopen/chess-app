@@ -19,6 +19,7 @@ export interface ClientToServerEvents {
 	rated_match:(user:UserProfile)=>void;
 	host_private_match:(user:UserProfile, room: string) =>void;
 	join_private_match:(user:UserProfile, room: string) =>void;
+	ai_match:(user:UserProfile)=>void;
 
 	attempt_move: (userProfile: UserProfile, room: string, move: ChessMove) => void;
 	get_current_game_info: (userProfile:UserProfile)=>void;

@@ -26,12 +26,20 @@ const Home: React.FC<Props> = () => {
 		}
 	}
 
+	function AIMatch() {
+		if (userProfile.username) {
+			socket.emit("ai_match", userProfile);
+			setInMatch(true);
+		}
+	}
+
 	return (
 		<>
 			<Navbar />
 			<div className="basic-page">
 				<div className="basic-container">
 					<button onClick={() => quickMatch()}>Quick Match</button>
+					<button onClick={() => AIMatch()}>Play Against AI</button>
 					{inMatch && <Navigate to="/chess" />}
 				</div>
 			</div>

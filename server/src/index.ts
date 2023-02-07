@@ -82,6 +82,11 @@ io.on("connection", (socket)=>{
         io.to(user.username).emit("current_room_info", room);
         io.to(room).emit("match_update", match);
     });
+
+    socket.on("ai_match", (user)=>{
+        
+    });
+
 //TODO
     socket.on("rated_match", (user)=>{
         
@@ -154,6 +159,7 @@ io.on("connection", (socket)=>{
     
 //--
     socket.on("disconnect", (reason)=>{
+        console.log(`Username:${socket.data.userProfile.username} has logged out.`)
         console.log(`Userid:${socket.id} disconnected from server.`);
     })
 
