@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const ChessTimer: React.FC<Props> = ({ time, isPaused }: Props) => {
-	const [currentTime, setCurrentTime] = useState<number>(time);
+	const [currentTime, setCurrentTime] = useState<number>(Math.floor(time / 1000)); //time in seconds
 	useEffect(() => {
 		setTimeout(async () => {
 			if (!isPaused) {
@@ -16,12 +16,12 @@ export const ChessTimer: React.FC<Props> = ({ time, isPaused }: Props) => {
 	}, [currentTime]);
 
 	function timerString() {
-		const currentSeconds = currentTime % 60;
-		const currentMinutes = Math.floor(currentTime / 60) % 60;
-		const currentHours = Math.floor(currentTime / 3600);
-		return `${currentHours > 0 ? `${currentHours}:` : ""}
-				${currentHours > 0 && currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes}:
-				${currentSeconds < 10 ? `0${currentSeconds}` : currentSeconds}`;
+		const displaySeconds = currentTime % 60;
+		const displayMinutes = Math.floor(currentTime / 60) % 60;
+		const displayHours = Math.floor(currentTime / 3600);
+		return `${displayHours > 0 ? `${displayHours}:` : ""}
+				${displayHours > 0 && displayMinutes < 10 ? `0${displayMinutes}` : displayMinutes}:
+				${displaySeconds < 10 ? `0${displaySeconds}` : displaySeconds}`;
 	}
 
 	return <div className="chess-timer">{timerString()}</div>;

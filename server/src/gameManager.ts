@@ -3,19 +3,19 @@ import { UserProfile } from "../../client/src/shared-libs/UserProfile";
 import { ChessGame } from "./game";
 
 export class GameManager{
-    private activeGames: ChessGame[];
+    private quickMatchGames: ChessGame[];
     private roomIncrementer: number;
     private ratedGameQueue: UserProfile[];
     
     constructor(){
-        this.activeGames = [];
+        this.quickMatchGames = [];
         this.ratedGameQueue = [];
         this.roomIncrementer = 1000;
         this.addGame();
     }
 
     public quick_match(user: UserProfile): ChessGame {
-        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        const nextGame: ChessGame = this.quickMatchGames[this.quickMatchGames.length - 1];
         nextGame.joinGame(user);
         if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
             nextGame.startGame();
@@ -42,14 +42,14 @@ export class GameManager{
             }
             
         })
-        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        const nextGame: ChessGame = this.quickMatchGames[this.quickMatchGames.length - 1];
         
         return nextGame;
     }
 
     //TODO
     public host_private_match(user: UserProfile): ChessGame {
-        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        const nextGame: ChessGame = this.quickMatchGames[this.quickMatchGames.length - 1];
         nextGame.joinGame(user);
         if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
             nextGame.startGame();
@@ -60,7 +60,7 @@ export class GameManager{
 
     //TODO
     public join_private_match(user: UserProfile): ChessGame {
-        const nextGame: ChessGame = this.activeGames[this.activeGames.length - 1];
+        const nextGame: ChessGame = this.quickMatchGames[this.quickMatchGames.length - 1];
         nextGame.joinGame(user);
         if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
             nextGame.startGame();
@@ -70,16 +70,16 @@ export class GameManager{
     }
    
     public getGame = (room: string): ChessGame | undefined =>{
-        return this.activeGames.find(game=>game.getRoom() === room);
+        return this.quickMatchGames.find(game=>game.getRoom() === room);
     }
 
     public addGame( whitePlayer: UserProfile | undefined = undefined, blackPlayer: UserProfile | undefined = undefined){
-        this.activeGames.push(new ChessGame(this.roomIncrementer.toString(), whitePlayer, blackPlayer))
+        this.quickMatchGames.push(new ChessGame(this.roomIncrementer.toString(), whitePlayer, blackPlayer))
         this.roomIncrementer++;
     }
 
     public removeGame(room:string){
-        this.activeGames = this.activeGames.filter((game)=>{
+        this.quickMatchGames = this.quickMatchGames.filter((game)=>{
             return game.getRoom() !== room;
         })
     }
@@ -122,6 +122,6 @@ export class GameManager{
     }
 
     public getUserCurrentGame(userProfile: UserProfile): ChessGame | undefined {
-        return this.activeGames.find(game=>(game.getBlackPlayer()?.username || game.getWhitePlayer()?.username) === userProfile.username)
+        return this.quickMatchGames.find(game=>(game.getBlackPlayer()?.username || game.getWhitePlayer()?.username) === userProfile.username)
     }    
 }

@@ -25,6 +25,12 @@ function ChessApp() {
 		message: "",
 	});
 
+	const [timeSinceLastUpdate, setTimeSinceLastUpdate] = useState(0); // in miliseconds
+	useEffect(() => {
+		const interval = setInterval(() => setTimeSinceLastUpdate(timeSinceLastUpdate + 1000), 1000);
+		return () => clearInterval(interval);
+	}, [timeSinceLastUpdate]);
+
 	const playerColor = (): ChessColor | undefined => {
 		if (currentChessMatch === null) return undefined;
 		if (userProfile.username === currentChessMatch.whitePlayer.username) {
@@ -94,6 +100,7 @@ function ChessApp() {
 			setRoom(room);
 		});
 		socket.on("match_update", (match) => {
+			setTimeSinceLastUpdate(0);
 			setCurrentChessMatch(match);
 			switch (match.result) {
 				case ChessMatchResult.Unfinished:
@@ -137,6 +144,16 @@ function ChessApp() {
 		}
 	}
 
+	function timerString(time: number) {
+		const timeInSeconds = Math.floor(time / 1000);
+		const displaySeconds = timeInSeconds % 60;
+		const displayMinutes = Math.floor(timeInSeconds / 60) % 60;
+		const displayHours = Math.floor(timeInSeconds / 3600);
+		return `${displayHours > 0 ? `${displayHours}:` : ""}
+				${displayHours > 0 && displayMinutes < 10 ? `0${displayMinutes}` : displayMinutes}:
+				${displaySeconds < 10 ? `0${displaySeconds}` : displaySeconds}`;
+	}
+
 	return (
 		<>
 			{userProfile.username ? (
@@ -150,7 +167,17 @@ function ChessApp() {
 											? currentChessMatch.blackPlayer.username
 											: currentChessMatch.whitePlayer.username}
 									</h3>
-									<ChessTimer time={5 * 60} isPaused={currentChessMatch.board.turn === playerColor()} />
+									{playerColor() === ChessColor.White
+										? timerString(
+												currentChessMatch.board.turn === ChessColor.Black
+													? currentChessMatch.timer.black - timeSinceLastUpdate
+													: currentChessMatch.timer.black
+										  )
+										: timerString(
+												currentChessMatch.board.turn === ChessColor.White
+													? currentChessMatch.timer.white - timeSinceLastUpdate
+													: currentChessMatch.timer.white
+										  )}
 								</div>
 
 								<ChessBoard
@@ -166,7 +193,17 @@ function ChessApp() {
 												? currentChessMatch.blackPlayer.username
 												: currentChessMatch.whitePlayer.username}
 										</h3>
-										<ChessTimer time={5 * 60} isPaused={currentChessMatch.board.turn !== playerColor()} />
+										{playerColor() === ChessColor.Black
+											? timerString(
+													currentChessMatch.board.turn === ChessColor.Black
+														? currentChessMatch.timer.black - timeSinceLastUpdate
+														: currentChessMatch.timer.black
+											  )
+											: timerString(
+													currentChessMatch.board.turn === ChessColor.White
+														? currentChessMatch.timer.white - timeSinceLastUpdate
+														: currentChessMatch.timer.white
+											  )}
 									</div>
 								</div>
 							</div>

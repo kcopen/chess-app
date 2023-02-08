@@ -27,6 +27,7 @@ app.post('/auth', async (req, res)=>{
     res.json(user);
 });
 
+
 app.post("/register", async (req, res)=>{
     const userProfile: UserProfile = req.body;
     const user = await UserModel.findOne({username: userProfile.username}).exec()

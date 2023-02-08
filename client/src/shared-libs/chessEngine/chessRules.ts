@@ -22,11 +22,11 @@ export const isValidMove = (move: ChessMove, validateCheck: boolean = true): boo
 		case PieceType.Bishop:
 			isValid = isValidBishopMove(move);
 			break;
+		case PieceType.Queen:
+				isValid = isValidQueenMove(move);
+				break;
 		case PieceType.King:
 			isValid = isValidKingMove(move);
-			break;
-		case PieceType.Queen:
-			isValid = isValidQueenMove(move);
 			break;
 		default:
 			isValid = false;
@@ -68,11 +68,13 @@ export const getValidTeamMoves = (color: ChessColor, board: Chessboard): ChessMo
 export const isPieceUnderAttack = (piece: Piece, board: Chessboard): boolean => {
 	const enemyPieces = board.pieces.filter((p) => p.pieceColor !== piece.pieceColor);
 	for (let enemyPiece of enemyPieces) {
+		//move enemy piece to attack the coords of the piece we are checking
 		const attackPiece = {
 			board: board,
 			pieceToMove: enemyPiece,
 			targetCoords: piece.coords,
 		};
+		//if the move is valid the piece we are checking is under attack
 		if (isValidMove(attackPiece, false)) return true;
 	}
 	return false;

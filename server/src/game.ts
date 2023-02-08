@@ -82,7 +82,7 @@ export class ChessGame{
         this.gameStatus = GameStatus.GameStarting;
         this.matchResult = ChessMatchResult.Unfinished;
         this.pendingDrawRequest = {whitePlayer:false, blackPlayer:false};
-        this.timer = {lastTimePunch: -1,white: 5 * 60, black: 5 * 60};
+        this.timer = {lastTimePunch: -1,white: 5 * 60 * 1000, black: 5 * 60 * 1000};
         if(board) {
             this.board = board;
         } else {
@@ -95,14 +95,17 @@ export class ChessGame{
             const turn = this.board.turn;
             const currentTime = Date.now();
             const timeDiff = currentTime - this.timer.lastTimePunch;
+            this.timer.lastTimePunch = currentTime;
             if(turn === ChessColor.White){
-                this.timer.white = this.timer.white - Math.floor(timeDiff / 1000);
+                this.timer.white = this.timer.white -timeDiff;
             }else {
-                this.timer.black = this.timer.black - Math.floor(timeDiff / 1000)
+                this.timer.black = this.timer.black - timeDiff;
             }
             if(this.timer.white <= 0){
+                console.log("white out of time")
                 this.endMatch(ChessMatchResult.BlackWins);
             }else if(this.timer.black <= 0){
+                console.log("white out of time")
                 this.endMatch(ChessMatchResult.WhiteWins);
             }
         }
@@ -140,6 +143,7 @@ export class ChessGame{
                 //if white cant move
                 if(this.board.turn === ChessColor.White && getValidTeamMoves(ChessColor.White, this.board).length < 1){
                     if(inCheckMate(ChessColor.White, this.board)){
+                        console.log("white in checkmate");
                         this.endMatch(ChessMatchResult.BlackWins);
                     }else {
                         this.endMatch(ChessMatchResult.Draw);
@@ -147,6 +151,7 @@ export class ChessGame{
                 //if black cant move
                 }else if(this.board.turn === ChessColor.Black && getValidTeamMoves(ChessColor.Black, this.board).length < 1){
                     if(inCheckMate(ChessColor.Black, this.board)){
+                        console.log("black in checkmate");
                         this.endMatch(ChessMatchResult.WhiteWins);
                     }else {
                         this.endMatch(ChessMatchResult.Draw);
