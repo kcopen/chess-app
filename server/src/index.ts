@@ -8,9 +8,11 @@ import { UserModel } from "./../models/users";
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '../../client/src/shared-libs/socketTypes';
 import { UserProfile } from '../../client/src/shared-libs/UserProfile';
 import { GameManager } from "./gameManager";
+import LoginManager from './loginManager';
 
 mongoose.connect("mongodb+srv://kncopen:JJsgprAN8MtytNV@chessapp.dktid98.mongodb.net/ChessDB?retryWrites=true&w=majority");
 
+const loginManager = new LoginManager();
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -18,10 +20,10 @@ app.use(cors());
 app.post('/auth', async (req, res)=>{
     const username: string = req.body.username;
     const password: string = req.body.password;
-    if(!username || !password) {
-        return res.status(400).json({'message':'Username and password are required.'});
-    }
-    const user = await UserModel.findOne({username, password}).exec();
+    if(!username || !password) return res.status(400).json({'message':'Username and password are required.'});
+    
+    const user: UserProfile = await UserModel.findOne({username, password}).exec();
+    if(!loginManager.connectUser(user)) return res.status(400).json({'message':'User already logged in.'});
     if(!user) return res.sendStatus(401);
     
     res.json(user);
@@ -70,7 +72,9 @@ io.on("connection", (socket)=>{
             socket.data.userProfile = userProfile;
             socket.join(userProfile.username);
             console.log(`Username:${userProfile.username} has logged in.`)
+            return true;
         }
+        return false;
     });
 
 //--matchmaking--
@@ -159,9 +163,23 @@ io.on("connection", (socket)=>{
 
     
 //--
+    socket.on("logout", (user:UserProfile)=>{
+        if(loginManager.disconnectUser(user)){
+            socket.leave(user.username);
+            console.log(`Username:${user.username} has logged out.`)
+            return true;
+        }
+        return false;
+        
+    })
+
     socket.on("disconnect", (reason)=>{
-        console.log(`Username:${socket.data.userProfile.username} has logged out.`)
-        console.log(`Userid:${socket.id} disconnected from server.`);
+        if(loginManager.disconnectUser(socket.data.userProfile)){
+            console.log(`Username:${socket.data.userProfile.username} has logged out.`)
+        }else{
+            console.log(`Userid:${socket.id} disconnected from server.`);
+        }
+        
     })
 
 

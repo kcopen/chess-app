@@ -13,7 +13,8 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-	login: (userProfile:UserProfile)=> void;
+	login: (userProfile:UserProfile)=> boolean;
+	logout: (userProfile:UserProfile)=> boolean;
 //matchmaking	
 	quick_match:(user: UserProfile)=>void;
 	rated_match:(user:UserProfile)=>void;

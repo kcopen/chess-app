@@ -12,8 +12,9 @@ const Navbar: React.FC = () => {
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 
 	function logout() {
-		socket.disconnect();
-		setUserProfile({} as UserProfile);
+		if (socket.emit("logout", userProfile)) {
+			setUserProfile({} as UserProfile);
+		}
 	}
 
 	return (
