@@ -13,6 +13,8 @@ import LoginManager from './loginManager';
 mongoose.connect("mongodb+srv://kncopen:JJsgprAN8MtytNV@chessapp.dktid98.mongodb.net/ChessDB?retryWrites=true&w=majority");
 
 const loginManager = new LoginManager();
+const gameManager = new GameManager();
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -63,7 +65,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
     }
 });
 
-const gameManager = new GameManager();
+
 
 io.on("connection", (socket)=>{
 
@@ -80,12 +82,15 @@ io.on("connection", (socket)=>{
 //--matchmaking--
     socket.on("quick_match", (user)=>{
         const game = gameManager.quick_match(user);
-        const room = game.getRoom();
-        const match = game.getMatch();
+        if(game){
+            const room = game.getRoom();
+            const match = game.getMatch();
 
-        socket.join(room);
-        io.to(user.username).emit("current_room_info", room);
-        io.to(room).emit("match_update", match);
+            socket.join(room);
+            io.to(user.username).emit("current_room_info", room);
+            io.to(room).emit("match_update", match);
+        }
+        
     });
 
     socket.on("ai_match", (user)=>{

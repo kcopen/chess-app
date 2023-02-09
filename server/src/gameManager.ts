@@ -14,14 +14,17 @@ export class GameManager{
         this.addGame();
     }
 
-    public quick_match(user: UserProfile): ChessGame {
+    public quick_match(user: UserProfile): ChessGame | undefined{
         const nextGame: ChessGame = this.quickMatchGames[this.quickMatchGames.length - 1];
-        nextGame.joinGame(user);
-        if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
-            nextGame.startGame();
-            this.addGame();
+        if(nextGame.getBlackPlayer()?.username !== user.username && nextGame.getWhitePlayer()?.username !== user.username){
+            nextGame.joinGame(user);
+            if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
+                nextGame.startGame();
+                this.addGame();
+            }
+            return nextGame;
         }
-        return nextGame;
+        return undefined;
     }
 //TODO
     public rated_match(user: UserProfile): ChessGame {

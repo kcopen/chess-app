@@ -17,19 +17,20 @@ const Home: React.FC<Props> = () => {
 		if (userProfile.username) {
 			socket.emit("login", userProfile);
 		}
+		socket.on("current_room_info", (room) => {
+			setInMatch(true);
+		});
 	}, []);
 
 	function quickMatch() {
 		if (userProfile.username) {
 			socket.emit("quick_match", userProfile);
-			setInMatch(true);
 		}
 	}
 
 	function AIMatch() {
 		if (userProfile.username) {
 			socket.emit("ai_match", userProfile);
-			setInMatch(true);
 		}
 	}
 

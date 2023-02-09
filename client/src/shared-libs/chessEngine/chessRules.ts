@@ -147,6 +147,12 @@ export const boardAfterMove = (move: ChessMove): Chessboard => {
 				friendlyRook.coords.x = 3;
 				friendlyRook.moveCount = friendlyRook.moveCount + 1;
 			}
+		}else if(move.targetCoords.x > pieceToMove.coords.x){
+			const friendlyRook = pieceAt({x: 8, y: pieceToMove.coords.y}, updatedBoard);
+			if(friendlyRook){
+				friendlyRook.coords.x = 5;
+				friendlyRook.moveCount = friendlyRook.moveCount + 1;
+			}
 		}
 	} 
 

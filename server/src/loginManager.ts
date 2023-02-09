@@ -7,6 +7,7 @@ export default class LoginManager{
     }
 
     connectUser(user: UserProfile): boolean{
+        
         if(this.onlineUsers.filter(u=>u.username === user.username).length > 0){
             //user already online
             return false;
@@ -16,6 +17,7 @@ export default class LoginManager{
     }
 
     disconnectUser(user:UserProfile): boolean{
+        if(this.onlineUsers.length < 1) return false;
         if(this.onlineUsers.splice(this.onlineUsers.indexOf(user), 1).length > 0)return true;
         return false;
     }
