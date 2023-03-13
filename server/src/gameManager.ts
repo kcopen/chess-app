@@ -16,10 +16,9 @@ export class GameManager{
 
     public quick_match(user: UserProfile): ChessGame | undefined{
         const nextGame: ChessGame = this.quickMatchGames[this.quickMatchGames.length - 1];
-        if(nextGame.getBlackPlayer()?.username !== user.username && nextGame.getWhitePlayer()?.username !== user.username){
+        if(!this.getUserCurrentGame(user)){
             nextGame.joinGame(user);
-            if(nextGame.getWhitePlayer() && nextGame.getBlackPlayer()){
-                nextGame.startGame();
+            if(nextGame.startGame()){
                 this.addGame();
             }
             return nextGame;
