@@ -1,14 +1,18 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
+import { SocketContext } from "./../../App";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { UserProfile } from "../../shared-libs/UserProfile";
 import "./Login.css";
 
 import axios from "../../API/axios";
+import { ClientToServerEvents, ServerToClientEvents } from "../../shared-libs/socketTypes";
+import { Socket } from "socket.io-client";
 const LOGIN_URL = "/auth";
 
 const Login: React.FC = () => {
 	const { userProfile, setUserProfile } = useAuth();
+	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const userRef = useRef<HTMLInputElement>(null);
 	const errRef = useRef<HTMLParagraphElement>(null);
 
@@ -30,9 +34,10 @@ const Login: React.FC = () => {
 			const response = await axios.post(LOGIN_URL, JSON.stringify({ username, password }), {
 				headers: { "Content-Type": "application/json" },
 			});
-			const userProfile: UserProfile = response?.data;
-			if (userProfile) {
-				setUserProfile(userProfile);
+			const userProfileData: UserProfile = response?.data;
+			if (userProfileData) {
+				setUserProfile(userProfileData);
+				socket.emit("login", userProfileData);
 				setUsername("");
 				setPassword("");
 			}

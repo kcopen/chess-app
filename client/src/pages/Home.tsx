@@ -14,9 +14,6 @@ const Home: React.FC<Props> = () => {
 	const [inMatch, setInMatch] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (userProfile.username) {
-			socket.emit("login", userProfile);
-		}
 		socket.on("current_room_info", (room) => {
 			setInMatch(true);
 		});

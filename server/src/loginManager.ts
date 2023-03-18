@@ -1,25 +1,25 @@
 import { UserProfile } from '../../client/src/shared-libs/UserProfile';
 
 export default class LoginManager{
-    onlineUsers: UserProfile[];
+    onlineUsers: Map<string, UserProfile>;
     constructor(){
-        this.onlineUsers = [];
+        this.onlineUsers = new Map<string, UserProfile>();
     }
 
+    //returns true if successful connection
     connectUser(user: UserProfile): boolean{
         
-        if(this.onlineUsers.filter(u=>u.username === user.username).length > 0){
+        if(this.onlineUsers.has(user.username)){
             //user already online
             return false;
         }
-        this.onlineUsers.push(user);
+        this.onlineUsers.set(user.username, user);
         return true;
     }
 
+    //returns true if successful disconnection
     disconnectUser(user:UserProfile): boolean{
-        if(this.onlineUsers.length < 1) return false;
-        if(this.onlineUsers.splice(this.onlineUsers.indexOf(user), 1).length > 0)return true;
-        return false;
+        return this.onlineUsers.delete(user.username)
     }
 
     printAllOnlineUsers(){

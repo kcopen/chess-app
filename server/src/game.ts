@@ -112,14 +112,15 @@ export class ChessGame{
 
     }
 
-    public joinGame(player: UserProfile){
+    public joinGame(player: UserProfile): boolean{
         if(!this.whitePlayer && this.gameStatus === GameStatus.GameStarting){
             this.whitePlayer = player;
+            return true;
         }else if(!this.blackPlayer && this.gameStatus === GameStatus.GameStarting){
             this.blackPlayer = player;
-        } else {
-            this.spectators.push(player);
+            return true;
         }
+        return false;
     }
 
 
