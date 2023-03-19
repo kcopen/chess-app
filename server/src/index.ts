@@ -25,8 +25,8 @@ app.post('/auth', async (req, res)=>{
     if(!username || !password) return res.status(400).json({'message':'Username and password are required.'});
     
     const user: UserProfile = await UserModel.findOne({username, password}).exec();
-    if(!loginManager.connectUser(user)) return res.status(400).json({'message':'User already logged in.'});
-    if(!user) return res.sendStatus(401);
+    if(!user) return res.status(401).json({'message':'Unauthorized.'});
+    if(!loginManager.connectUser(user)) return res.status(403).json({'message':'User already logged in.'});
     
     res.json(user);
 });
@@ -166,7 +166,10 @@ io.on("connection", (socket)=>{
         }
     });
 
-    
+    socket.on("leave_room", (room)=>{
+        console.log(`Username:${socket.data.userProfile.username} has left room:${room}.`)
+        socket.leave(room)
+    })
 //--
     socket.on("logout", (user:UserProfile)=>{
         if(loginManager.disconnectUser(user)){

@@ -15,6 +15,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
 	login: (userProfile:UserProfile)=> boolean;
 	logout: (userProfile:UserProfile)=> boolean;
+	leave_room: (room:string)=> void;
 //matchmaking	
 	quick_match:(user: UserProfile)=>void;
 	rated_match:(user:UserProfile)=>void;

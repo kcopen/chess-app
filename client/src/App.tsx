@@ -16,12 +16,12 @@ const App: React.FC = () => {
 	return (
 		<AuthProvider>
 			<Routes>
-				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
 			</Routes>
 
 			<SocketContext.Provider value={socket}>
 				<Routes>
+					<Route path="/login" element={<Login />} />
 					<Route element={<RequireAuth />}>
 						<Route path="/chess" element={<ChessApp />} />
 						<Route path="/" element={<Home />} />

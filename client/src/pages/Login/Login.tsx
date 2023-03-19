@@ -45,9 +45,11 @@ const Login: React.FC = () => {
 			if (!err?.response) {
 				setErrMsg("No server response.");
 			} else if (err.response?.status === 400) {
-				setErrMsg("Missing username or password.");
+				setErrMsg("Username and password are required.");
 			} else if (err.response?.status === 401) {
 				setErrMsg("Unauthorized.");
+			} else if (err.response?.status === 403) {
+				setErrMsg("That user is already logged in.");
 			} else {
 				setErrMsg("Login Failed.");
 			}

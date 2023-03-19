@@ -8,9 +8,7 @@ export default class LoginManager{
 
     //returns true if successful connection
     connectUser(user: UserProfile): boolean{
-        
-        if(this.onlineUsers.has(user.username)){
-            //user already online
+        if(!user || this.onlineUsers.has(user.username)){
             return false;
         }
         this.onlineUsers.set(user.username, user);
@@ -19,12 +17,13 @@ export default class LoginManager{
 
     //returns true if successful disconnection
     disconnectUser(user:UserProfile): boolean{
+        if(!user) return false;
         return this.onlineUsers.delete(user.username)
     }
 
     printAllOnlineUsers(){
         let printString = "Online Users:";
-        this.onlineUsers.forEach((u)=>{printString.concat(u.username)});
+        this.onlineUsers.forEach((u)=>{printString.concat(" " + u.username)});
         console.log(printString);
     }
 }

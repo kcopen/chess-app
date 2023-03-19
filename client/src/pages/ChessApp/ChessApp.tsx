@@ -219,7 +219,14 @@ function ChessApp() {
 					) : (
 						<div className="chess-app-game-over">
 							<h1>{gameState.message}</h1>
-							<Link to="/">Return to home page</Link>
+							<Link
+								to="/"
+								onClick={() => {
+									socket.emit("leave_room", room);
+								}}
+							>
+								Return to home page
+							</Link>
 						</div>
 					)
 				) : (
