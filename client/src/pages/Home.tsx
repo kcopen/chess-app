@@ -12,12 +12,22 @@ const Home: React.FC<Props> = () => {
 	const { userProfile } = useAuth();
 	const socket = useContext(SocketContext) as Socket<ServerToClientEvents, ClientToServerEvents>;
 	const [inMatch, setInMatch] = useState<boolean>(false);
+	const [inQueue, setInQueue] = useState<boolean>(false);
 
 	useEffect(() => {
 		socket.on("current_room_info", (room) => {
-			setInMatch(true);
+			if (room === "") {
+				setInMatch(false);
+				setInQueue(false);
+			} else if (room === "In Queue") {
+				setInQueue(true);
+				setInMatch(false);
+			} else {
+				setInQueue(false);
+				setInMatch(true);
+			}
 		});
-	}, []);
+	}, [socket]);
 
 	function quickMatch() {
 		if (userProfile.username) {
@@ -31,13 +41,32 @@ const Home: React.FC<Props> = () => {
 		}
 	}
 
+	function HomeButtons() {
+		return (
+			<>
+				<button onClick={() => quickMatch()}>Quick Match</button>
+				<button onClick={() => AIMatch()}>Play Against AI</button>
+			</>
+		);
+	}
+
+	//TODO add leave queue button functionality
+	function LeaveQueueButton() {
+		return (
+			<>
+				<p>You are in queue!</p>
+				<button onClick={() => {}}>Leave Queue</button>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<Navbar />
 			<div className="basic-page">
 				<div className="basic-container">
-					<button onClick={() => quickMatch()}>Quick Match</button>
-					<button onClick={() => AIMatch()}>Play Against AI</button>
+					{!inQueue ? HomeButtons() : LeaveQueueButton()}
+
 					{inMatch && <Navigate to="/chess" />}
 				</div>
 			</div>

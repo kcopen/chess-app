@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 import { UserModel } from "./../models/users";
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '../../client/src/shared-libs/socketTypes';
 import { UserProfile } from '../../client/src/shared-libs/UserProfile';
-import { GameManager } from "./gameManager";
-import LoginManager from './loginManager';
+import { GameManager } from "./GameManager";
+import LoginManager from './LoginManager';
 
 mongoose.connect("mongodb+srv://kncopen:JJsgprAN8MtytNV@chessapp.dktid98.mongodb.net/ChessDB?retryWrites=true&w=majority");
 
@@ -85,12 +85,23 @@ io.on("connection", (socket)=>{
         if(game){
             const room = game.getRoom();
             const match = game.getMatch();
+            const whitePlayer = game.getWhitePlayer()?.username;
+            const blackPlayer = game.getBlackPlayer()?.username;
+            if(whitePlayer && blackPlayer){
+                io.to(whitePlayer).emit("current_room_info", room)
+                io.to(whitePlayer).emit("match_update", match)
 
-            socket.join(room);
-            io.to(user.username).emit("current_room_info", room);
-            io.to(room).emit("match_update", match);
+                io.to(blackPlayer).emit("current_room_info", room)
+                io.to(blackPlayer).emit("match_update", match)
+            }
+        }else{
+            io.to(user.username).emit("current_room_info", "In Queue");
         }
         
+    });
+
+    socket.on("join_room", (room)=>{
+        socket.join(room);
     });
 
     socket.on("ai_match", (user)=>{

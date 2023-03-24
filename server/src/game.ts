@@ -136,6 +136,10 @@ export class ChessGame{
     }
 
     public attemptMove(player: UserProfile, move: ChessMove): Chessboard | undefined{
+        if(this.gameStatus === GameStatus.GameStarting && this.getPlayerColor(player) === ChessColor.White){
+            this.startGame()
+        }
+        
         if(this.gameStatus !== GameStatus.GameRunning) return undefined;
         if(player.username === this.whitePlayer?.username || player.username === this.blackPlayer?.username){
             if(isValidMove(move)){

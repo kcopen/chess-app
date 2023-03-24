@@ -98,6 +98,7 @@ function ChessApp() {
 	useEffect(() => {
 		socket.on("current_room_info", (room) => {
 			setRoom(room);
+			socket.emit("join_room", room);
 		});
 		socket.on("match_update", (match) => {
 			setTimeSinceLastUpdate(0);
