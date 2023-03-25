@@ -9,6 +9,7 @@ import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from '.
 import { UserProfile } from '../../client/src/shared-libs/UserProfile';
 import { GameManager } from "./GameManager";
 import LoginManager from './LoginManager';
+import { ChessMatchResult } from '../../client/src/shared-libs/chessEngine/ChessTypes';
 
 mongoose.connect("mongodb+srv://kncopen:JJsgprAN8MtytNV@chessapp.dktid98.mongodb.net/ChessDB?retryWrites=true&w=majority");
 
@@ -130,6 +131,9 @@ io.on("connection", (socket)=>{
             const updatedMatch = gameManager.getGame(room)?.getMatch();
             if(updatedMatch){
                 io.to(room).emit("match_update", updatedMatch);
+                if(updatedMatch.result !== ChessMatchResult.Unfinished){
+                    gameManager.removeGame(room);
+                }
             }
         }
     });
@@ -140,7 +144,12 @@ io.on("connection", (socket)=>{
         const match = game?.getMatch();
         if(room && match){
             io.to(user.username).emit("current_room_info", room);
-            io.to(user.username).emit("match_update", match);
+            if(match.result === ChessMatchResult.Unfinished){
+                io.to(user.username).emit("match_update", match);
+            } else {
+                io.to(room).emit("match_update", match);
+                gameManager.removeGame(room);
+            }
         }
         
     });
@@ -161,6 +170,7 @@ io.on("connection", (socket)=>{
             if(game.attemptResign(userProfile)){
                 const match = game.getMatch();
                 io.to(room).emit("match_update", match);
+                gameManager.removeGame(room);
             }
         }
     });
@@ -171,6 +181,7 @@ io.on("connection", (socket)=>{
             if(game.attemptDraw(userProfile)){
                 const match = game.getMatch();
                 io.to(room).emit("match_update", match);
+                gameManager.removeGame(room);
             }else {
                 socket.to(room).emit("draw_requested", true)
             }

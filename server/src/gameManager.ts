@@ -68,7 +68,9 @@ export class GameManager{
         return game;
     }
 
+    //TODO need to remove game after it is over
     public removeGame(room:string){
+        console.log("room:" + room + " has been removed")
         if(room.startsWith("QM"))//quick match
             this.quickMatchGames.delete(room)
         else if(room.startsWith("RM"))//rated match
