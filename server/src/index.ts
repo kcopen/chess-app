@@ -82,7 +82,7 @@ io.on("connection", (socket)=>{
 
 //--matchmaking--
     socket.on("quick_match", (user)=>{
-        const game = gameManager.quick_match(user);
+        const game = gameManager.joinQuickMatch(user);
         if(game){
             const room = game.getRoom();
             const match = game.getMatch();
