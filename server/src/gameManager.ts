@@ -105,13 +105,18 @@ export class GameManager{
         return undefined;
     }
 
-    //TODO
     public hostPrivateMatch(user: UserProfile, roomName: string, roomPassword: string = ""): ChessGame | undefined{
-        return undefined;
+        if(this.privateMatchGames.has(roomName)) return undefined;
+       
+        let hostedGame = new ChessGame(roomName, undefined, undefined, undefined, roomPassword);
+        Math.random() < 0.5 ? hostedGame.joinGame(user,ChessColor.White) : hostedGame.joinGame(user,ChessColor.Black);
+        this.privateMatchGames.set(roomName, hostedGame);
+
+        return hostedGame;
     }
 
     //TODO
-    public joinPrivateMatch(user: UserProfile): ChessGame | undefined{
+    public joinPrivateMatch(user: UserProfile, roomName: string, roomPassword: string = ""): ChessGame | undefined{
        return undefined;
     }
    

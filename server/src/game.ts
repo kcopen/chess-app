@@ -14,6 +14,7 @@ enum GameStatus {
 
 export class ChessGame{
     private room: string;
+    private roomPassword: string ;
     private gameStatus: GameStatus;
 
     private whitePlayer: UserProfile | undefined;
@@ -74,8 +75,9 @@ export class ChessGame{
     }
     
 
-    constructor(room: string, whitePlayer: UserProfile | undefined = undefined, blackPlayer: UserProfile | undefined = undefined, board: Chessboard | undefined = undefined){
+    constructor(room: string,  whitePlayer: UserProfile | undefined = undefined, blackPlayer: UserProfile | undefined = undefined, board: Chessboard | undefined = undefined, roomPassword:string = ""){
         this.room = room;
+        this.roomPassword = roomPassword;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
         this.spectators = [];
@@ -112,8 +114,11 @@ export class ChessGame{
 
     }
 
-    public joinGame(player: UserProfile): boolean{
-        if(!this.whitePlayer && this.gameStatus === GameStatus.GameStarting){
+    public joinGame(player: UserProfile, color: ChessColor=ChessColor.White): boolean{
+        if(!this.blackPlayer && color === ChessColor.Black && this.gameStatus === GameStatus.GameStarting){
+            this.blackPlayer = player;
+            return true;
+        }else if(!this.whitePlayer && this.gameStatus === GameStatus.GameStarting ){
             this.whitePlayer = player;
             return true;
         }else if(!this.blackPlayer && this.gameStatus === GameStatus.GameStarting){
